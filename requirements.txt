@@ -1,0 +1,10 @@
+flask
+pypdf
+langchain
+chromadb # vector db
+pytest
+boto3
+langchain-chroma
+langchain_community
+anthropic
+openai

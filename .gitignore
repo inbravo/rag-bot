@@ -1,0 +1,5 @@
+/chroma-ollama
+/chroma-openai
+/data
+*.pyc
+/logs

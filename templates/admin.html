@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚙️ Admin Settings</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <script src="../static/admin_settings.js"></script>
+</head>
+<body>
+    <h1>⚙️ Admin Settings</h1>
+    <form action="{{ url_for('update_settings') }}" method="POST" onsubmit="handleFormSubmission(event)">
+        <div id="admin-container">
+            <label for="llm_model_type">LLM Model Type:</label>
+            <select id="llm_model_type" name="llm_model_type" onchange="updateApiKeyField();">
+                <option value="gpt" {% if llm_model_type == 'gpt' %}selected{% endif %}>GPT</option>
+                <option value="ollama" {% if llm_model_type == 'ollama' %}selected{% endif %}>Ollama</option>
+                <option value="claude" {% if llm_model_type == 'claude' %}selected{% endif %}>Claude</option>
+            </select><br>
+
+            <label for="llm_model_name">LLM Model Name:</label>
+            <select id="llm_model_name" name="llm_model_name" onchange="toggleOtherInput('llm_model_name', 'llm_model_name_other');">
+                <!-- Options will be populated by JavaScript -->
+            </select>
+            <input type="text" id="llm_model_name_other" name="llm_model_name_other" style="display: none;"><br>
+
+            <label for="embedding_model_name">Embedding Model Name:</label>
+            <select id="embedding_model_name" name="embedding_model_name" disabled>
+                <!-- Options will be populated by JavaScript -->
+            </select><br>
+
+            <label for="num_relevant_docs">Number of Relevant Docs:</label>
+            <input type="number" id="num_relevant_docs" name="num_relevant_docs" value="{{ num_relevant_docs }}"><br>
+
+            <div id="openai_api_key_field" style="display: none;">
+                <label for="openai_api_key">OpenAI API Key:</label>
+                <input type="text" id="openai_api_key" name="openai_api_key" value="{{ openai_api_key }}"><br>
+            </div>
+
+            <div id="claude_api_key_field" style="display: none;">
+                <label for="claude_api_key">Claude API Key:</label>
+                <input type="text" id="claude_api_key" name="claude_api_key" value="{{ claude_api_key }}"><br>
+            </div>
+
+            <button type="submit">Update Settings</button>
+        </div>
+    </form>
+    <a href="{{ url_for('index') }}">🔙 Go to Chat</a>
+</body>
+</html>
