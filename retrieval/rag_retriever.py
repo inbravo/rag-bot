@@ -2,6 +2,11 @@ from langchain_chroma import Chroma
 from langchain.schema import Document
 from embeddings.embeddings import Embeddings
 
+# RAGRetriever class to handle retrieval-augmented generation
+# It interacts with a vector database to fetch relevant documents based on query similarity.
+# It uses an embedding model to compute text embeddings for similarity comparison.
+# The class provides methods to query the vector database and format the results for downstream use.
+# It extracts relevant context and source information from the retrieved documents.
 class RAGRetriever:
     def __init__(self, vector_db_path: str, embedding_model_name: str, api_key: str):
         self.vector_db_path = vector_db_path

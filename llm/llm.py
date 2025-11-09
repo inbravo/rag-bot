@@ -15,6 +15,13 @@ Answer the following question: {question}
 Avoid to start the answer saying that you are basing on the provided context and go straight with the response.
 """
 
+# Abstract base class for LLM models
+# Defines the interface for invoking models and generating responses
+# Concrete implementations for Ollama, GPT, and Anthropic models
+# Each subclass implements the invoke method specific to the model's API
+# The generate_response method formats the prompt and calls invoke to get the response
+# It uses a consistent prompt template across different models.
+
 class LLM(ABC):
     def __init__(self, model_name: str):
         self.model_name = model_name

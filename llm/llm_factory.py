@@ -1,5 +1,6 @@
 from llm.llm import LLM, GPTModel, OllamaModel, AnthropicModel
 
+# Factory class to create LLM instances based on model type
 class LLMFactory:
     @staticmethod
     def create_llm(model_type: str, model_name: str, api_key: str = None) -> LLM:
