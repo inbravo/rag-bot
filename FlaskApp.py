@@ -1,6 +1,7 @@
-from flask import Flask, jsonify, redirect, render_template, request, url_for
-
+# Flask web application to interact with LLM and RAG retriever
+# This app provides an interface to submit queries, view responses, and manage settings.
 from AppConfig import AppConfig
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 
 # Initial components
 AppConfig.initialize_components()
@@ -49,8 +50,8 @@ def update_settings():
 def query():
     query_text = request.json["query_text"]
 
-    results = AppConfig.retriever.query(query_text, k=AppConfig.NUM_RELEVANT_DOCS)
-    enhanced_context_text, sources = AppConfig.retriever.format_results(results)
+    results = AppConfig.rag_retriever.query(query_text, k=AppConfig.NUM_RELEVANT_DOCS)
+    enhanced_context_text, sources = AppConfig.rag_retriever.format_results(results)
 
     # Generate response from LLM
     llm_response = AppConfig.llm_model.generate_response(

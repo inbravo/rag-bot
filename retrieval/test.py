@@ -1,2 +1,0 @@
-import unstructured
-print(unstructured.__version__)

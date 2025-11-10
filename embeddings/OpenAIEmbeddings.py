@@ -1,5 +1,9 @@
 from openai import OpenAI
 
+# Define OpenAIEmbeddings class to encapsulate embedding create methods
+# This class will be used by Chroma for embedding documents and queries
+# It uses OpenAI's embedding API to generate embeddings for given texts
+# amit.dixit@inbravo
 class OpenAIEmbeddings:
     """
     class that implements two methods to be called from Chroma

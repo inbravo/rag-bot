@@ -1,13 +1,15 @@
-from embeddings.openai_embeddings import OpenAIEmbeddings
+from embeddings.OpenAIEmbeddings import OpenAIEmbeddings
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_community.embeddings.bedrock import BedrockEmbeddings
 
-class Embeddings:
+# Embeddings class to select and return the appropriate embedding function based on the specified model name.
+# It supports Ollama, OpenAI, and Bedrock embedding models.
+class EmbeddingFactory:
     def __init__(self, model_name: str, api_key: str = None):
         self.model_name = model_name
         self.api_key = api_key
 
-    def get_embedding_function(self):
+    def create_embedding_function(self):
         if self.model_name == "ollama":
             return OllamaEmbeddings(model="mxbai-embed-large")
         elif self.model_name == "openai":

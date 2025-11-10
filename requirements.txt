@@ -1,10 +1,17 @@
+# Core libraries (testing etc.)
+pytest
+
+# Libraries for web framework and PDF handling
 flask
 pypdf
+
+# Libraries for LangChain and vector databases
 langchain
-chromadb # vector db
-pytest
-boto3
 langchain-chroma
 langchain_community
+chromadb # vector db
+
+# Additional libraries for AI integrations
+boto3
 anthropic
 openai

@@ -3,13 +3,13 @@ import os
 from dotenv import load_dotenv, set_key
 
 from llm.llm_factory import LLMFactory
-from retrieval.rag_retriever import RAGRetriever
+from retrieval.RAGRetriever import RAGRetriever
 
 # Load environment variables from .env file
 load_dotenv()
 
-
-# Configuration class to manage RAG components
+# Configuration class to manage the program components, including retriever and LLM model. 
+# It loads configuration from environment variables, initializes the retriever and LLM model and provides methods to update the configuration dynamically.
 class AppConfig:
     """
     AppConfig
@@ -44,29 +44,23 @@ class AppConfig:
             Updates the configuration values in the environment file and reinitializes the components.
     """
 
-    retriever = None
+    rag_retriever = None
     llm_model = None
 
-    # global VECTOR_DB_OPENAI_PATH, VECTOR_DB_OLLAMA_PATH, LLM_MODEL_NAME, LLM_MODEL_TYPE, EMBEDDING_MODEL_NAME, NUM_RELEVANT_DOCS, OPENAI_API_KEY
-
     # Load configuration from environment variables
+    ENV_PATH = ".env"
     VECTOR_DB_OPENAI_PATH = os.getenv("VECTOR_DB_OPENAI_PATH")
     VECTOR_DB_OLLAMA_PATH = os.getenv("VECTOR_DB_OLLAMA_PATH")
-    LLM_MODEL_NAME = os.getenv(
-        "LLM_MODEL_NAME"
-    )  # 'gpt-3.5-turbo', 'GPT-4o' or local LLM like 'llama3:8b', 'gemma2', 'mistral:7b' etc.
-    LLM_MODEL_TYPE = os.getenv("LLM_MODEL_TYPE")  # 'ollama', 'gpt' or 'claude'
-    EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME")  # 'ollama' or 'openai'
+    # 'gpt-3.5-turbo', 'GPT-4o' or local LLM like 'llama3:8b', 'gemma2', 'mistral:7b' etc.
+    LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME")
+    LLM_MODEL_TYPE = os.getenv("LLM_MODEL_TYPE")
+    EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME")
     NUM_RELEVANT_DOCS = int(os.getenv("NUM_RELEVANT_DOCS"))
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
-    ENV_PATH = ".env"
 
     # Initialize RAG components: retriever and LLM model
     def initialize_components():
-        # Determine vector DB path based on embedding model
-        vector_db_path = AppConfig.get_vector_db_path(AppConfig.EMBEDDING_MODEL_NAME)
-
         # Select the appropriate API key based on the embedding model
         # No API key is required for Ollama embeddings
         if AppConfig.EMBEDDING_MODEL_NAME == "openai":
@@ -74,18 +68,18 @@ class AppConfig:
         else:
             api_key = AppConfig.CLAUDE_API_KEY
 
-        # Initialize retriever based on embedding model name
-        AppConfig.retriever = RAGRetriever(
-            vector_db_path=vector_db_path,
+        # Initialize RAG retriever based on embedding model name
+        AppConfig.rag_retriever = RAGRetriever(
+            vector_db_path=AppConfig.get_vector_db_path(AppConfig.EMBEDDING_MODEL_NAME),
             embedding_model_name=AppConfig.EMBEDDING_MODEL_NAME,
-            api_key=api_key,
+            api_key=api_key
         )
 
         # Initialize LLM model based on embedding model name
         AppConfig.llm_model = LLMFactory.create_llm(
             model_type=AppConfig.LLM_MODEL_TYPE,
             model_name=AppConfig.LLM_MODEL_NAME,
-            api_key=api_key,
+            api_key=api_key
         )
 
         # Log the LLM details
@@ -99,7 +93,7 @@ class AppConfig:
         LLM_MODEL_TYPE: str,
         EMBEDDING_MODEL_NAME: str,
         NUM_RELEVANT_DOCS: str,
-        OPENAI_API_KEY: str,
+        OPENAI_API_KEY: str
     ):
 
         # Update the .env file
