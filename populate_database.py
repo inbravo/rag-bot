@@ -3,7 +3,7 @@ import os
 import shutil
 import logging
 from datetime import datetime
-from embeddings.embeddings import Embeddings
+from embeddings.EmbeddingFactory import EmbeddingFactory
 from langchain_community.document_loaders import (
     PyPDFDirectoryLoader,
     UnstructuredWordDocumentLoader,
@@ -90,10 +90,10 @@ def main():
         logger.info(f"Initializing embeddings with model: {args.embedding_model}")
 
         # Create the instance of embedding factory
-        embeddings = Embeddings(model_name=args.embedding_model, api_key=OPENAI_API_KEY)
+        embeddings = EmbeddingFactory(model_name=args.embedding_model, api_key=OPENAI_API_KEY)
 
         # Call the embedding function from the factory
-        embedding_function = embeddings.get_embedding_function()
+        embedding_function = embeddings.create_embedding_function()
         logger.info("Embedding function created successfully")
 
         # Determine the correct path for the database based on the embedding model

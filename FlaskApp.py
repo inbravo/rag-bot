@@ -1,7 +1,7 @@
 # Flask web application to interact with LLM and RAG retriever
 # This app provides an interface to submit queries, view responses, and manage settings.
-from AppConfig import AppConfig
 from flask import Flask, jsonify, redirect, render_template, request, url_for
+from AppConfig import AppConfig
 
 # Initial components
 AppConfig.initialize_components()

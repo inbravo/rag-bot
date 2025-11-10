@@ -1,7 +1,7 @@
 import os
-
+import logging
+from datetime import datetime
 from dotenv import load_dotenv, set_key
-
 from llm.llm_factory import LLMFactory
 from retrieval.RAGRetriever import RAGRetriever
 
@@ -61,6 +61,10 @@ class AppConfig:
 
     # Initialize RAG components: retriever and LLM model
     def initialize_components():
+
+        # Setup logging
+        logger = AppConfig.setup_logging()
+        logger.info("=== Application Initialized ===")
         # Select the appropriate API key based on the embedding model
         # No API key is required for Ollama embeddings
         if AppConfig.EMBEDDING_MODEL_NAME == "openai":
@@ -129,3 +133,28 @@ class AppConfig:
             return AppConfig.VECTOR_DB_OLLAMA_PATH
         else:
             raise ValueError(f"Unsupported embedding model: {embedding_model_name}")
+
+    # Setup logging configuration
+    def setup_logging():
+        """Configure logging for the database population process."""
+        # Create logs directory if it doesn't exist
+        log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+        os.makedirs(log_dir, exist_ok=True)
+        
+        # Create log filename with timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        log_file = os.path.join(log_dir, f'populate_database_{timestamp}.log')
+        
+        # Configure logging
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s',
+            handlers=[
+                logging.FileHandler(log_file, encoding='utf-8'),
+                logging.StreamHandler()  # Also log to console
+            ]
+        )
+        
+        logger = logging.getLogger(__name__)
+        logger.info(f"Database population logging initialized. Log file: {log_file}")
+        return logger
