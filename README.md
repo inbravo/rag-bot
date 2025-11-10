@@ -94,20 +94,6 @@ For this project, i exploited the following components to build the RAG architec
 10. **Perform a query** 
 
 ## 🚀 Future Improvements
-Here are some ideas for future improvements:
-- [x] Add OpenAI LLM GPT models compatibility (3.5 turbo, 4, 4-o)
-- [x] Add Anthropic Claude LLM models compatibility (Claude 3.5 Sonnet, Claude 3 Sonnet, Claude 3 Opus, Claude 3 Haiku)
-- [x] Add unit testing to validate the responses given by the LLM
-- [x] Add an admin user interface in web UI to choose interactively the parameters like LLMs, embedding models etc.
 - [ ] Add Langchain Tools compatibility, allowing users to define custom Python functions that can be utilized by the LLMs.
-- [ ] Add web scraping in case none of the personal documents contain relevant info w.r.t. the query
+- [ ] Add automated test cases
 
-## 📹 Demo Video
-Watch the demo video below to see the RAG Chatbot in action:
-
-[![YT Video](https://img.youtube.com/vi/_JVt5gwwZq0/0.jpg)](https://www.youtube.com/watch?v=_JVt5gwwZq0)
-
-The demo was run on my PC with the following specifications:
-- **Processor**: Intel(R) Core(TM) i7-14700K 3.40 GHz
-- **RAM**: 32.0 GB
-- **GPU**: NVIDIA GeForce RTX 3090 FE 24 GB
