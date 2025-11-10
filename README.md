@@ -1,6 +1,13 @@
-A simple local Retrieval-Augmented Generation (RAG) chatbot that can answer to questions by acquiring information from personal pdf documents.
+A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answer to questions by scanning the documents (pdf, doc, excel etc.).
 
-(please, if you find this content useful please consider leaving a star ⭐)
+## Solution components and purpose
+| #  |  Python code | Purpose   | Design Principle   |   |
+|---|---|---|---|---|
+|  1 |  Flask web application to interact with LLM and RAG retriever |   |   |   |
+| 2 | | Application Configuration module. It loads configuration from environment variables, initializes the retriever and LLM model and provides methods to update the configuration dynamically. | | |
+| 2  |   | RAGRetriever class to handle retrieval-augmented generation. It interacts with a vector database to fetch relevant documents based on query similarity. It uses an embedding model to compute text embeddings for similarity comparison. It extracts relevant context and source information from the retrieved documents. |   |   |
+|   |   |   |   |   |
+
 
 ##  What is Retrieval-Augmented Generation (RAG)?
 <div style="text-align: center;">
