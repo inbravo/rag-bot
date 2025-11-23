@@ -53,6 +53,8 @@ class AppConfig:
 
     # Load configuration from environment variables
     ENV_PATH = ".env"
+    # The path where all the documents are available on local system
+    DATA_PATH = os.getenv("DATA_PATH")
     VECTOR_DB_OPENAI_PATH = os.getenv("VECTOR_DB_OPENAI_PATH")
     VECTOR_DB_OLLAMA_PATH = os.getenv("VECTOR_DB_OLLAMA_PATH")
     # 'gpt-3.5-turbo', 'GPT-4o' or local LLM like 'llama3:8b', 'gemma2', 'mistral:7b' etc.
