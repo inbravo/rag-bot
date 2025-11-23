@@ -43,6 +43,9 @@ class AppConfig:
             OPENAI_API_KEY: str
             Updates the configuration values in the environment file and reinitializes the components.
     """
+    # Constructor
+    def __init__(self):
+        pass
 
     rag_retriever = None
     llm_model = None
