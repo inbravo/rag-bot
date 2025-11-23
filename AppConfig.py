@@ -46,6 +46,7 @@ class AppConfig:
 
     rag_retriever = None
     llm_model = None
+    logger = None
 
     # Load configuration from environment variables
     ENV_PATH = ".env"
@@ -143,7 +144,7 @@ class AppConfig:
         
         # Create log filename with timestamp
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        log_file = os.path.join(log_dir, f'populate_database_{timestamp}.log')
+        log_file = os.path.join(log_dir, f'rag-bot_{timestamp}.log')
         
         # Configure logging
         logging.basicConfig(
@@ -156,5 +157,11 @@ class AppConfig:
         )
         
         logger = logging.getLogger(__name__)
-        logger.info(f"Database population logging initialized. Log file: {log_file}")
+        logger.info(f"Logging initialized. Log file: {log_file}")
         return logger
+
+    # Get logging configuration (if the logger is already set up)
+    def get_default_logger():
+        if AppConfig.logger is None:
+            AppConfig.logger = AppConfig.setup_logging()
+        return AppConfig.logger

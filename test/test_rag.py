@@ -1,8 +1,11 @@
 import os
 from dotenv import load_dotenv
-from llm.llm import GPTModel, OllamaModel
 from llm.llm_factory import LLMFactory
-from retrieval.rag_retriever import RAGRetriever
+from retrieval.RAGRetriever import RAGRetriever
+from AppConfig import AppConfig
+
+# Initial components
+AppConfig.initialize_components()
 
 load_dotenv()
 
@@ -47,26 +50,18 @@ print(LLM_MODEL_TYPE)
 print(LLM_MODEL_NAME)
 print(EMBEDDING_MODEL_NAME)
 
-def test_num_employees_alpha():
+def test_leaplogic_intro():
     assert query_and_validate(
-        question="How many people are in the head staff inside the alpha corporation? (Answer with the number only)",
-        expected_response="4",
+        question="what is leaplogic?",
+        expected_response="LeapLogic is a product used by Impetus for migration services. It can be installed in a non-production environment/Sandbox, allowing team members to work without accessing production environments.",
         retriever=retriever,
         llm_model=llm_model
     )
 
-def test_company_field_beta():
+def test_cobit_details():
     assert query_and_validate(
-        question="What is the field in which the beta enterprises operate? (Answer with few words)",
-        expected_response="biotechnology and pharmaceuticals",
-        retriever=retriever,
-        llm_model=llm_model
-    )
-
-def test_foundation_year_gamma():
-    assert query_and_validate(
-        question="When was the gamma innovation society founded? (Answer with the number only)",
-        expected_response="2015",
+        question="what is COBIT?",
+        expected_response="COBIT (Control Objectives for Information and Related Technology) is a set of guidelines, best practices, and standards for ensuring the effective governance and management of information technology. It provides a comprehensive framework for IT audit, control, and security professionals to assess and improve the organization's IT processes and systems.",
         retriever=retriever,
         llm_model=llm_model
     )
@@ -85,11 +80,15 @@ def query_and_validate(question: str, expected_response: str, retriever, llm_mod
     Returns:
     bool: True if the LLM validates that the actual response matches the expected response, False otherwise.
     """
+
+    # Retrieve relevant documents
     results = retriever.query(question, k=NUM_RELEVANT_DOCS)
     enhanced_context_text, sources = retriever.format_results(results)
     
     # Generate response from LLM
     response_text = llm_model.generate_response(context=enhanced_context_text, question=question)
+
+    AppConfig.get_default_logger().info(f"Testing question: {question} | expected response: {expected_response} | LLM response: {response_text} | Sources:", sources)
 
     # Use the same LLM also for response validation
     prompt = EVAL_PROMPT.format(
@@ -119,6 +118,5 @@ if __name__ == "__main__":
     """
         to run tests type: 'pytest test/test_rag.py -s' in cmd
     """
-    test_num_employees_alpha()
-    test_company_field_beta()
-    test_foundation_year_gamma()
+    test_leaplogic_intro()
+    test_cobit_details()

@@ -36,16 +36,42 @@ class RAGRetriever:
         self.embedding_function = embeddings.create_embedding_function()
         self.db = Chroma(persist_directory=self.vector_db_path, embedding_function=self.embedding_function)
 
+    # Query the vector database for similar documents
+    # Returns a list of tuples containing Document and similarity score
+    # Input value 'k' specifies the number of top similar documents to retrieve
+    # Each Document contains page_content and metadata
+    # The similarity score indicates how similar the document is to the query
     def query(self, query_text: str, k: int = 4):
         # compute similarity between embeddings of query and of pdf text chunks
         results = self.db.similarity_search_with_score(query_text, k=k)
         return results
 
+    # Format the results from the query into context text and sources
+    # Returns a tuple containing:
+    # 1. enhanced_context_text: concatenated page contents of retrieved documents
+    # 2. sources: list of unique formatted source strings
+    # Each source string is formatted as "filename page X" where filename is extracted from the document metadata and X is the page number
+    # The sources are extracted from the metadata of each Document
+    # The set is used to ensure uniqueness of sources
+    # The final sources are returned as a list
     def format_results(self, results: list[tuple[Document, float]]):
         enhanced_context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
         sources = set(self.format_source(doc.metadata) for doc, _score in results)  # set to ensure uniqueness
         return enhanced_context_text, list(sources)
 
+    # Format the source information from document metadata
+    # Returns a string in the format "filename page X"
+    # where filename is extracted from the source path in metadata and X is the page number
+    # The source path is split to extract only the filename
+    # The page number is retrieved from metadata
+    # If source or page is missing, defaults to "unknown"
+    # Example: "document.pdf page 5"
+    # Returns: str
+    # Extract and format source information from metadata
+    #   Parameters:
+    #       metadata (dict): Metadata dictionary containing 'source' and 'page' keys.
+    #   Returns:
+    #       str: Formatted source string.
     def format_source(self, metadata: dict):
         source = metadata.get("source", "unknown")
         page = metadata.get("page", "unknown")
