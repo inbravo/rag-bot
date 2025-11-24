@@ -11,7 +11,7 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 
 ##  System control flow
 <div style="text-align: center;">
-<img src="https://github.com/inbravo/rag-bot/tree/main/images/call-flow.png" alt="call-flow" width="600" height="300">
+<img src="https://github.com/inbravo/rag-bot/blob/main/images/call-flow.png" alt="call-flow">
 </div>
 
 ## 🛠️ Setup and Local Deployment
