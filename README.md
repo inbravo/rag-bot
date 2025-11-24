@@ -9,31 +9,10 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 | 4 | [EmbeddingFactory][Link_10.md] | Embedding Factory class to select and return the appropriate embedding function based on the specified model name (Ollama, OpenAI etc) | [Vectorization & Similarity Scoring][Link_11.md] |  [Langchain Embeddings][Link_12.md]|
 | 5 | [DocUploader][Link_13.md]| Manage the database population with embeddings | [Vector Database][Link_14.md] | [Langchain Chroma][Link_15.md] | 
 
-
-##  What is Retrieval-Augmented Generation (RAG)?
+##  System control flow
 <div style="text-align: center;">
-<img src="https://miro.medium.com/v2/resize:fit:1400/1*J7vyY3EjY46AlduMvr9FbQ.png" alt="rag_pipeline" width="600" height="300">
+<img src="https://github.com/inbravo/rag-bot/tree/main/images/call-flow.png" alt="call-flow" width="600" height="300">
 </div>
-Retrieval-Augmented Generation (RAG) is a technique that combines the strengths of information retrieval and natural language generation. In a RAG system, a retriever fetches relevant documents or text chunks from a database, and then a generator produces a response based on the retrieved context.
-
-1. **Data Indexing**
-- Documents: This is the starting point where multiple documents are stored.
-- Vector DB: The documents are processed and indexed into a Vector Database.
-
-2. **User Query**
-- A user query is input into the system, which interacts with the Vector Database.
-
-3. **Data Retrieval & Generation**
-- Top-K Chunks: The Vector Database retrieves the top-K relevant chunks based on the user query.
-- LLM (Large Language Model): These chunks are then fed into a Large Language Model.
-- Response: The LLM generates a response based on the relevant chunks.
-
-## 🏗️ Implementation Components
-For this project, i exploited the following components to build the RAG architecture:
-1. **Chroma**: A vector database used to store and retrieve document embeddings efficiently.
-2. **Flask**: Framework for rendering web page and handling user interactions.
-3. **Ollama**: Manages the local language model for generating responses.
-4. **LangChain**: A framework for integrating language models and retrieval systems.
 
 ## 🛠️ Setup and Local Deployment
 
