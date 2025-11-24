@@ -1,12 +1,12 @@
 A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answer to questions by scanning the documents (pdf, doc, excel etc.).
 
-## Solution components and purpose
+## Solution components
 | #  |  Python code | Purpose   | Design Principle   | Technology  |
 |---|---|---|---|---|
 | 1 | [FlaskApp](https://github.com/inbravo/rag-bot/blob/main/FlaskApp.py) |  Server side to manage user request from web browser | [WSGI](https://flask.palletsprojects.com/en/stable/design)  |  [Flask](https://flask.palletsprojects.com/en/stable/) |
-| 2 | [AppConfig](https://github.com/inbravo/rag-bot/blob/main/AppConfig.py) | Application module to load configuration from environment variables, initializes the retriever and LLM model and provides methods to update the configuration dynamically. | | [DotEnv](https://github.com/motdotla/dotenv) |
-| 3 | [RagRetriever](https://github.com/inbravo/rag-bot/blob/main/retrieval/RAGRetriever.py)  | RAGRetriever class to handle retrieval-augmented generation. It interacts with a vector database to fetch relevant documents based on query similarity. It uses an embedding model to compute text embeddings for similarity comparison. It extracts relevant context and source information from the retrieved documents. |   | [Langchain Chroma Vectorstore](https://api.python.langchain.com/en/latest/vectorstores/langchain_chroma.vectorstores.Chroma.html)  |
-| 4 | [EmbeddingFactory](https://github.com/inbravo/rag-bot/blob/main/embeddings/EmbeddingFactory.py) | Embedding Factory class to select and return the appropriate embedding function based on the specified model name (Ollama, OpenAI etc) |   |  [Langchain Embeddings](https://api.python.langchain.com/en/latest/community/embeddings.html) |
+| 2 | [AppConfig](https://github.com/inbravo/rag-bot/blob/main/AppConfig.py) | Application module to load configuration from environment variables, initializes the retriever and LLM model and provides methods to update the configuration dynamically. | [12 Factor Config](https://12factor.net/config) | [DotEnv](https://github.com/motdotla/dotenv) |
+| 3 | [RagRetriever](https://github.com/inbravo/rag-bot/blob/main/retrieval/RAGRetriever.py)  | RAGRetriever class to handle retrieval-augmented generation. It interacts with a vector database to fetch relevant documents based on query similarity. It uses an embedding model to compute text embeddings for similarity comparison. It extracts relevant context and source information from the retrieved documents. | [2 Step RAG](https://docs.langchain.com/oss/python/langchain/retrieval)  | [Langchain Chroma Vectorstore](https://api.python.langchain.com/en/latest/vectorstores/langchain_chroma.vectorstores.Chroma.html)  |
+| 4 | [EmbeddingFactory](https://github.com/inbravo/rag-bot/blob/main/embeddings/EmbeddingFactory.py) | Embedding Factory class to select and return the appropriate embedding function based on the specified model name (Ollama, OpenAI etc) | [Vectorization & Similarity Scoring](https://docs.langchain.com/oss/python/integrations/text_embedding)  |  [Langchain Embeddings](https://api.python.langchain.com/en/latest/community/embeddings.html) |
 
 
 ##  What is Retrieval-Augmented Generation (RAG)?
