@@ -3,10 +3,11 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 ## Solution components
 | #  |  Python code | Purpose   | Design Principle   | Technology  |
 |---|---|---|---|---|
-| 1 | [FlaskApp](https://github.com/inbravo/rag-bot/blob/main/FlaskApp.py) |  Server side to manage user request from web browser | [WSGI](https://flask.palletsprojects.com/en/stable/design)  |  [Flask](https://flask.palletsprojects.com/en/stable/) |
-| 2 | [AppConfig](https://github.com/inbravo/rag-bot/blob/main/AppConfig.py) | Application module to load configuration from environment variables, initializes the retriever and LLM model and provides methods to update the configuration dynamically. | [12 Factor Config](https://12factor.net/config) | [DotEnv](https://github.com/motdotla/dotenv) |
-| 3 | [RagRetriever](https://github.com/inbravo/rag-bot/blob/main/retrieval/RAGRetriever.py)  | RAGRetriever class to handle retrieval-augmented generation. It interacts with a vector database to fetch relevant documents based on query similarity. It uses an embedding model to compute text embeddings for similarity comparison. It extracts relevant context and source information from the retrieved documents. | [2 Step RAG](https://docs.langchain.com/oss/python/langchain/retrieval)  | [Langchain Chroma Vectorstore](https://api.python.langchain.com/en/latest/vectorstores/langchain_chroma.vectorstores.Chroma.html)  |
-| 4 | [EmbeddingFactory](https://github.com/inbravo/rag-bot/blob/main/embeddings/EmbeddingFactory.py) | Embedding Factory class to select and return the appropriate embedding function based on the specified model name (Ollama, OpenAI etc) | [Vectorization & Similarity Scoring](https://docs.langchain.com/oss/python/integrations/text_embedding)  |  [Langchain Embeddings](https://api.python.langchain.com/en/latest/community/embeddings.html) |
+| 1 | [FlaskApp][Link_1.md] |  Server side to manage user request from web browser | [WSGI][Link_2.md] |  [Flask][Link_3.md] |
+| 2 | [AppConfig][Link_4.md] | Application module to load configuration from environment variables, initializes the retriever and LLM model and provides methods to update the configuration dynamically. | [12 Factor Config][Link_5.md] | [DotEnv][Link_6.md] |
+| 3 | [RagRetriever][Link_7.md] | RAGRetriever class to handle retrieval-augmented generation. It interacts with a vector database to fetch relevant documents based on query similarity. It uses an embedding model to compute text embeddings for similarity comparison. It extracts relevant context and source information from the retrieved documents. | [2 Step RAG][Link_8.md]  | [Langchain Chroma Vectorstore][Link_9.md]  |
+| 4 | [EmbeddingFactory][Link_10.md] | Embedding Factory class to select and return the appropriate embedding function based on the specified model name (Ollama, OpenAI etc) | [Vectorization & Similarity Scoring][Link_11.md] |  [Langchain Embeddings][Link_12.md]|
+| 5 | [DocUploader][Link_13.md]| Manage the database population with embeddings | [Vector Database][Link_14.md] | [Langchain Chroma][Link_15.md] | 
 
 
 ##  What is Retrieval-Augmented Generation (RAG)?
@@ -97,3 +98,19 @@ For this project, i exploited the following components to build the RAG architec
 - [ ] Add Langchain Tools compatibility, allowing users to define custom Python functions that can be utilized by the LLMs.
 - [ ] Add automated test cases
 
+
+[Link_1.md]: https://github.com/inbravo/rag-bot/blob/main/FlaskApp.py
+[Link_2.md]: https://flask.palletsprojects.com/en/stable/design
+[Link_3.md]: https://flask.palletsprojects.com/en/stable/design](https://flask.palletsprojects.com/en/stable
+[Link_4.md]: https://github.com/inbravo/rag-bot/blob/main/AppConfig.py
+[Link_5.md]: https://12factor.net/config
+[Link_6.md]: https://github.com/motdotla/dotenv
+[Link_7.md]: https://github.com/inbravo/rag-bot/blob/main/retrieval/RAGRetriever.py
+[Link_8.md]: https://docs.langchain.com/oss/python/langchain/retrieval
+[Link_9.md]: https://api.python.langchain.com/en/latest/vectorstores/langchain_chroma.vectorstores.Chroma.html
+[Link_10.md]: https://github.com/inbravo/rag-bot/blob/main/embeddings/EmbeddingFactory.py
+[Link_11.md]: https://docs.langchain.com/oss/python/integrations/text_embedding
+[Link_12.md]: https://api.python.langchain.com/en/latest/community/embeddings.html
+[Link_13.md]: https://github.com/inbravo/rag-bot/blob/main/DocUploader.py
+[Link_14.md]: https://docs.trychroma.com/docs/overview/getting-started
+[Link_15.md]: https://docs.langchain.com/oss/python/integrations/vectorstores/chroma
