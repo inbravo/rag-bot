@@ -72,7 +72,9 @@ class AppConfig:
     CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 
     # Initialize RAG components: retriever and LLM model
+    @staticmethod
     def initialize_components():
+        """ Initialize the RAG retriever and LLM model based on the configuration. """
 
         # Setup logging
         logger = AppConfig.setup_logging()
@@ -112,6 +114,7 @@ class AppConfig:
         NUM_RELEVANT_DOCS: str,
         OPENAI_API_KEY: str
     ):
+        """ Update the configuration values and reinitialize the components. """
 
         # Update the .env file
         set_key(AppConfig.ENV_PATH, "LLM_MODEL_NAME", LLM_MODEL_NAME)

@@ -1,17 +1,23 @@
 from AppConfig import AppConfig
 
-# Initial components
+# Initialize application components
 AppConfig.initialize_components()
 
+# Evaluation prompt template for response validation
 EVAL_PROMPT = """
 Expected Response: {expected_response}
 Actual Response: {actual_response}
 ---
 (Answer with 'true' or 'false') Does the actual response match the expected response? 
 """
+
+
 # amit.dixit@inbravo
 # Test function to validate LeapLogic introduction
 def test_leaplogic_intro():
+    """ Test function to validate LeapLogic introduction"""
+
+    # Call the helper function to query and validate the response
     assert query_and_validate(
         question="what is leaplogic?",
         expected_response="LeapLogic is a product used by Impetus for migration services. It can be installed in a non-production environment/Sandbox, allowing team members to work without accessing production environments.",
@@ -22,6 +28,8 @@ def test_leaplogic_intro():
 
 # Test function to validate COBIT details
 def test_cobit_details():
+    """ Test function to validate COBIT details"""
+    # Call the helper function to query and validate the response
     assert query_and_validate(
         question="what is COBIT?",
         expected_response="COBIT (Control Objectives for Information and Related Technology) is a set of guidelines, best practices, and standards for ensuring the effective governance and management of information technology. It provides a comprehensive framework for IT audit, control, and security professionals to assess and improve the organization's IT processes and systems.",
@@ -47,11 +55,13 @@ def query_and_validate(question: str, expected_response: str, retriever, llm_mod
     bool: True if the LLM validates that the actual response matches the expected response, False otherwise.
     """
 
-    # Retrieve relevant documents
+    # Retrieve relevant results from the Vector DB (Chroma)
     results = retriever.query(question, k=AppConfig.NUM_RELEVANT_DOCS)
+
+    # Format the results to get enhanced context
     enhanced_context_text, sources = retriever.format_results(results)
 
-    # Generate response from LLM
+    # Pass on the enhanced context and user query to LLM to get the best answer
     response_text = llm_model.generate_response(
         context=enhanced_context_text, question=question
     )
@@ -59,7 +69,10 @@ def query_and_validate(question: str, expected_response: str, retriever, llm_mod
     # Log the question, expected response, actual response, and sources
     AppConfig.get_default_logger(__name__).info(
         "Testing question: %s | expected response: %s | LLM response: %s | Info Sources: %s",
-        question, expected_response, response_text, sources
+        question,
+        expected_response,
+        response_text,
+        sources,
     )
 
     # Use the same LLM also for response validation
@@ -81,9 +94,16 @@ def query_and_validate(question: str, expected_response: str, retriever, llm_mod
         print("\033[91m" + f"Response: {evaluation_results_str_cleaned}" + "\033[0m")
         return False
     else:
-        raise ValueError("Invalid evaluation result. Cannot determine if 'true' or 'false'.")
+        raise ValueError(
+            "Invalid evaluation result. Cannot determine if 'true' or 'false'."
+        )
+
 
 # Main block to run tests
 if __name__ == "__main__":
+
+    # Run test function 1
     test_leaplogic_intro()
+
+    # Run test function 2
     test_cobit_details()

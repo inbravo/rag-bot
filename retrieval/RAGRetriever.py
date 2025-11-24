@@ -2,6 +2,7 @@ from langchain_chroma import Chroma
 from langchain.schema import Document
 from embeddings.EmbeddingFactory import EmbeddingFactory
 
+# amit.dixit@inbravo
 # RAGRetriever class to handle retrieval-augmented generation
 # It interacts with a vector database to fetch relevant documents based on query similarity.
 # It uses an embedding model to compute text embeddings for similarity comparison.
