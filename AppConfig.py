@@ -8,6 +8,7 @@ from retrieval.RAGRetriever import RAGRetriever
 # Load environment variables from .env file
 load_dotenv()
 
+# amit.dixit@inbravo
 # Configuration class to manage the program components, including retriever and LLM model. 
 # It loads configuration from environment variables, initializes the retriever and LLM model and provides methods to update the configuration dynamically.
 class AppConfig:

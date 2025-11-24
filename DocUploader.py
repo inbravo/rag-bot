@@ -19,6 +19,7 @@ from embeddings.EmbeddingFactory import EmbeddingFactory
 # Initial components
 AppConfig.initialize_components()
 
+# amit.dixit@inbravo
 # Main function to manage the population of the database with embeddings.
 def main():
     """
