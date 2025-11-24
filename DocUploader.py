@@ -413,7 +413,7 @@ def validate_data_directory():
     Returns:
         dict: Dictionary with file type counts and subdirectory information
     """
-   logger = AppConfig.get_default_logger(__name__)
+    logger = AppConfig.get_default_logger(__name__)
 
     if not os.path.exists(AppConfig.DATA_PATH):
         logger.error("Data directory does not exist: %s", AppConfig.DATA_PATH)

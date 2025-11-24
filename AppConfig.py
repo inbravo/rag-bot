@@ -180,5 +180,6 @@ class AppConfig:
         # Return the default logger instance if already set up
         if AppConfig.logger is None:
             AppConfig.logger = AppConfig.setup_logging()
+
         # Return named logger or default logger
-        return logging.getLogger(name) if name else AppConfig.logger
+        return logging.getLogger(name) if name else logging.getLogger()
