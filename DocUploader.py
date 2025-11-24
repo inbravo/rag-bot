@@ -39,7 +39,7 @@ def main():
     - ValueError: If an unsupported embedding model is specified.
     """
     # Setup logging
-    logger = logger = AppConfig.get_default_logger()
+    logger = AppConfig.get_default_logger(__name__)
 
     try:
         logger.info("=== Database Population Script Started ===")
@@ -132,7 +132,7 @@ def reset_databases(reset_choice):
                             - "ollama": Resets the Ollama database.
                             - "both": Resets both the OpenAI and Ollama databases.
     """
-    logger = AppConfig.get_default_logger()
+    logger = AppConfig.get_default_logger(__name__)
     logger.info(f"Starting database reset process for: {reset_choice}")
 
     if reset_choice in ["openai", "both"]:
@@ -167,7 +167,7 @@ def ask_to_clear_database(embedding_model):
     Returns:
         bool: True if the user confirms by entering 'yes', False otherwise.
     """
-    logger = AppConfig.get_default_logger()
+    logger = AppConfig.get_default_logger(__name__)
     logger.info(f"Prompting user for confirmation to clear {embedding_model} database")
 
     response = (
@@ -192,7 +192,7 @@ def load_documents():
     Returns:
         List[Document]: A list of Document objects loaded from various file types.
     """
-    logger = AppConfig.get_default_logger()
+    logger = AppConfig.get_default_logger(__name__)
     logger.info("Loading documents from directory: %s", AppConfig.DATA_PATH)
 
     try:
@@ -413,7 +413,7 @@ def validate_data_directory():
     Returns:
         dict: Dictionary with file type counts and subdirectory information
     """
-    logger = AppConfig.get_default_logger()
+   logger = AppConfig.get_default_logger(__name__)
 
     if not os.path.exists(AppConfig.DATA_PATH):
         logger.error("Data directory does not exist: %s", AppConfig.DATA_PATH)
@@ -474,7 +474,7 @@ def get_directory_structure():
     Returns:
         dict: Directory structure information
     """
-    logger = AppConfig.get_default_logger()
+    logger = AppConfig.get_default_logger(__name__)
 
     if not os.path.exists(AppConfig.DATA_PATH):
         logger.error("Data directory does not exist: %s", AppConfig.DATA_PATH)
@@ -524,7 +524,7 @@ def split_documents(documents: list[Document]):
     Returns:
         list[Document]: A list of smaller Document chunks created by splitting the input documents.
     """
-    logger = AppConfig.get_default_logger()
+    logger = AppConfig.get_default_logger(__name__)
     logger.info(f"Starting document splitting process for {len(documents)} documents")
 
     try:
@@ -566,7 +566,7 @@ def add_to_chroma(chunks: list[Document], db):
         chunks (list[Document]): A list of document chunks to be added to the database.
         db: The Chroma database instance where the documents will be stored.
     """
-    logger = AppConfig.get_default_logger()
+    logger = AppConfig.get_default_logger(__name__)
     logger.info(f"Starting process to add {len(chunks)} chunks to Chroma database")
 
     try:
@@ -625,7 +625,7 @@ def calculate_chunk_ids(chunks):
     Returns:
         list: The input list of chunks with updated metadata containing the unique IDs.
     """
-    logger = AppConfig.get_default_logger()
+    logger = AppConfig.get_default_logger(__name__)
     logger.info(f"Calculating unique IDs for {len(chunks)} chunks")
 
     try:
@@ -675,7 +675,7 @@ def clear_database(embedding_model):
     Args:
         embedding_model (str): The name of the embedding model ("openai" or "ollama").
     """
-    logger = AppConfig.get_default_logger()
+    logger = AppConfig.get_default_logger(__name__)
     logger.info(f"Clearing database for embedding model: {embedding_model}")
 
     try:
@@ -713,7 +713,7 @@ def rebuild_database(embedding_model):
     Args:
         embedding_model (str): The name of the embedding model ("openai" or "ollama").
     """
-    logger = AppConfig.get_default_logger()
+    logger = AppConfig.get_default_logger(__name__)
     logger.info(f"Rebuilding database for embedding model: {embedding_model}")
 
     try:

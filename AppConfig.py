@@ -9,7 +9,7 @@ from retrieval.RAGRetriever import RAGRetriever
 load_dotenv()
 
 # amit.dixit@inbravo
-# Configuration class to manage the program components, including retriever and LLM model. 
+# Configuration class to manage the program components, including retriever and LLM model.
 # It loads configuration from environment variables, initializes the retriever and LLM model and provides methods to update the configuration dynamically.
 class AppConfig:
     """
@@ -54,10 +54,15 @@ class AppConfig:
 
     # Load configuration from environment variables
     ENV_PATH = ".env"
+
     # The path where all the documents are available on local system
     DATA_PATH = os.getenv("DATA_PATH")
+    LOG_DIR = os.getenv("LOG_DIR")
+
+    # The path to the vector DBs for different embedding models
     VECTOR_DB_OPENAI_PATH = os.getenv("VECTOR_DB_OPENAI_PATH")
     VECTOR_DB_OLLAMA_PATH = os.getenv("VECTOR_DB_OLLAMA_PATH")
+
     # 'gpt-3.5-turbo', 'GPT-4o' or local LLM like 'llama3:8b', 'gemma2', 'mistral:7b' etc.
     LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME")
     LLM_MODEL_TYPE = os.getenv("LLM_MODEL_TYPE")
@@ -72,6 +77,7 @@ class AppConfig:
         # Setup logging
         logger = AppConfig.setup_logging()
         logger.info("=== Application Initialized ===")
+
         # Select the appropriate API key based on the embedding model
         # No API key is required for Ollama embeddings
         if AppConfig.EMBEDDING_MODEL_NAME == "openai":
@@ -142,10 +148,12 @@ class AppConfig:
             raise ValueError(f"Unsupported embedding model: {embedding_model_name}")
 
     # Setup logging configuration
+    @staticmethod
     def setup_logging():
         """Configure logging for the database population process."""
+
         # Create logs directory if it doesn't exist
-        log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+        log_dir = os.path.join(os.path.dirname(__file__), AppConfig.LOG_DIR)
         os.makedirs(log_dir, exist_ok=True)
         
         # Create log filename with timestamp
@@ -155,7 +163,7 @@ class AppConfig:
         # Configure logging
         logging.basicConfig(
             level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s',
+            format='%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s:%(lineno)d - %(message)s',
             handlers=[
                 logging.FileHandler(log_file, encoding='utf-8'),
                 logging.StreamHandler()  # Also log to console
@@ -163,11 +171,14 @@ class AppConfig:
         )
         
         logger = logging.getLogger(__name__)
-        logger.info(f"Logging initialized. Log file: {log_file}")
+        logger.info("Logging initialized. Log file: %s at location: %s", log_file, log_dir)
         return logger
 
     # Get logging configuration (if the logger is already set up)
-    def get_default_logger():
+    def get_default_logger(name:str=None):
+
+        # Return the default logger instance if already set up
         if AppConfig.logger is None:
             AppConfig.logger = AppConfig.setup_logging()
-        return AppConfig.logger
+        # Return named logger or default logger
+        return logging.getLogger(name) if name else AppConfig.logger

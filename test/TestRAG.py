@@ -57,8 +57,9 @@ def query_and_validate(question: str, expected_response: str, retriever, llm_mod
     )
 
     # Log the question, expected response, actual response, and sources
-    AppConfig.get_default_logger().info(
-        f"Testing question: {question} | expected response: {expected_response} | LLM response: {response_text} | Info Sources: {sources}"
+    AppConfig.get_default_logger(__name__).info(
+        "Testing question: %s | expected response: %s | LLM response: %s | Info Sources: %s",
+        question, expected_response, response_text, sources
     )
 
     # Use the same LLM also for response validation
