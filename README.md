@@ -40,8 +40,8 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 
 2. **Clone the repository and navigate to the project directory**:
     ```sh
-    git clone https://github.com/enricollen/rag-conversational-agent.git
-    cd rag-conversational-agent
+    git clone https://github.com/inbravo/rag-bot.git
+    cd rag-bot
     ```
 
 3. **Create a virtual environment**:
@@ -59,12 +59,12 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 
 6. **Run once the populate_database script to index the pdf files into the vector db:**
     ```sh
-    python populate_database.py
+    python DocUploader.py
     ```
 
 7. **Run the application:**
     ```sh
-    python app.py
+    python FlaskApp.py
     ```
 
 8. **Navigate to `http://localhost:5000/`**
