@@ -8,6 +8,7 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 | 3 | [RagRetriever][Link_7.md] | RAGRetriever class to handle retrieval-augmented generation. It interacts with a vector database to fetch relevant documents based on query similarity. It uses an embedding model to compute text embeddings for similarity comparison. It extracts relevant context and source information from the retrieved documents. | [2 Step RAG][Link_8.md]  | [Langchain Chroma Vectorstore][Link_9.md]  |
 | 4 | [EmbeddingFactory][Link_10.md] | Embedding Factory class to select and return the appropriate embedding function based on the specified model name (Ollama, OpenAI etc) | [Vectorization & Similarity Scoring][Link_11.md] |  [Langchain Embeddings][Link_12.md]|
 | 5 | [DocUploader][Link_13.md]| Manage the database population with embeddings | [Vector Database][Link_14.md] | [Langchain Chroma][Link_15.md] | 
+| 6 | [LLMFactory][Link_16.md] | Factory class to create LLM instances based on model type e.g., 'ollama', 'gpt', 'claude') | [Factory Pattern][Link_17.md] | [Langchain Models][Link_18.md] |
 
 ##  System control flow
 <div style="text-align: center;">
@@ -93,3 +94,6 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 [Link_13.md]: https://github.com/inbravo/rag-bot/blob/main/DocUploader.py
 [Link_14.md]: https://docs.trychroma.com/docs/overview/getting-started
 [Link_15.md]: https://docs.langchain.com/oss/python/integrations/vectorstores/chroma
+[Link_16.md]: https://github.com/inbravo/rag-bot/blob/main/llm/llm_factory.py
+[Link_17.md]: https://en.wikipedia.org/wiki/Factory_method_pattern
+[Link_18.md]: https://docs.langchain.com/oss/python/langchain/models
