@@ -76,7 +76,6 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 
 ## 🚀 Future Improvements
 - [ ] Add Langchain Tools compatibility, allowing users to define custom Python functions that can be utilized by the LLMs.
-- [ ] Add automated test cases
 
 
 [Link_1.md]: https://github.com/inbravo/rag-bot/blob/main/FlaskApp.py
