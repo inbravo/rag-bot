@@ -15,68 +15,40 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 <img src="https://github.com/inbravo/rag-bot/blob/main/images/call-flow.png" alt="call-flow">
 </div>
 
-## 🛠️ Setup and Local Deployment
+## LLM configuration
 
-1. **Choose Your Setup**:
-   - You have three different options for setting up the LLMs:
-     1. Local setup using Ollama.
-     2. Using the OpenAI API for GPT models.
-     3. Using the Anthropic API for Claude models.
+|# | Option | Description|
+|---|---|---|
+| 1 | Local Setup with Ollama | **Download and install Ollama on your PC**: Visit [Ollama's official website](https://ollama.com/download) to download and install Ollama. Ensure you have sufficient hardware resources to run the local language model. Pull a LMM of your choice: ```sh ollama pull <model_name>  # e.g. ollama pull llama3:8b ``` |
+| 2 | Use OpenAI API for GPT Models | **Set up OpenAI API**: you can sign up and get your API key from [OpenAI's website](https://openai.com/api/). |
+| 3 | Use Anthropic API for Claude Models | **Set up Anthropic API**: you can sign up and get your API key from [Anthropic's website](https://www.anthropic.com/api). | 
 
-### Option 1: Local Setup with Ollama
-
-- **Download and install Ollama on your PC**:
-   - Visit [Ollama's official website](https://ollama.com/download) to download and install Ollama. Ensure you have sufficient hardware resources to run the local language model.
-   - Pull a LMM of your choice:
-   ```sh
-   ollama pull <model_name>  # e.g. ollama pull llama3:8b
-
-### Option 2: Use OpenAI API for GPT Models
-- **Set up OpenAI API**: you can sign up and get your API key from [OpenAI's website](https://openai.com/api/).
-
-### Option 3: Use Anthropic API for Claude Models
-- **Set up Anthropic API**: you can sign up and get your API key from [Anthropic's website](https://www.anthropic.com/api).
-
-## Common Steps
-
-2. **Clone the repository and navigate to the project directory**:
+## Code repo setup and build
+1. **Clone the repository and navigate to the project directory**:
     ```sh
     git clone https://github.com/inbravo/rag-bot.git
     cd rag-bot
     ```
-
-3. **Create a virtual environment**:
+2. **Create a virtual environment**:
     ```sh
     python -m venv venv
     source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
     ```
-
-4. **Install the required libraries**:
+3. **Install the required libraries**:
     ```sh
     pip install -r requirements.txt
     ```
-
-5. **Insert you own PDFs in /data folder**
-
-6. **Run once the populate_database script to index the pdf files into the vector db:**
+4. **Insert you own PDFs in /data folder**
+5. **Run once the populate_database script to index the pdf files into the vector db:**
     ```sh
     python DocUploader.py
     ```
-
-7. **Run the application:**
+6. **Run the application:**
     ```sh
     python FlaskApp.py
     ```
-
-8. **Navigate to `http://localhost:5000/`**
-
-9. **If needed, click on ⚙️ icon to access the admin panel and adjust app parameters**
-
-10. **Perform a query** 
-
-## 🚀 Future Improvements
-- [ ] Add Langchain Tools compatibility, allowing users to define custom Python functions that can be utilized by the LLMs.
-
+7. Navigate to **`http://localhost:5000/`** and If needed, click on ⚙️ icon to access the admin panel and adjust app parameters
+9. Perform a query and Chatbot will reply the best answer
 
 [Link_1.md]: https://github.com/inbravo/rag-bot/blob/main/FlaskApp.py
 [Link_2.md]: https://flask.palletsprojects.com/en/stable/design
