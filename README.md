@@ -1,7 +1,7 @@
 A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answer to questions by scanning the documents (pdf, doc, excel etc.).
 
 ## Solution components
-| #  |  Code/File | Purpose   | Design Principle   | Technology  |
+| #  |  Code/File | Purpose   | Design Principle   | Tech Stack  |
 |---|---|---|---|---|
 | 1 | [FlaskApp][Link_1.md] |  Server side to manage user request from web browser | [WSGI][Link_2.md] |  [Flask][Link_3.md] |
 | 2 | [AppConfig][Link_4.md] and [Enviornment file][Link_19.md]| Application module to load configuration from environment variables, initializes the retriever and LLM model and provides methods to update the configuration dynamically. | [12 Factor Config][Link_5.md] | [DotEnv][Link_6.md] |
