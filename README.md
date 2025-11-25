@@ -1,10 +1,10 @@
 A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answer to questions by scanning the documents (pdf, doc, excel etc.).
 
 ## Solution components
-| #  |  Python code | Purpose   | Design Principle   | Technology  |
+| #  |  Code/File | Purpose   | Design Principle   | Technology  |
 |---|---|---|---|---|
 | 1 | [FlaskApp][Link_1.md] |  Server side to manage user request from web browser | [WSGI][Link_2.md] |  [Flask][Link_3.md] |
-| 2 | [AppConfig][Link_4.md] | Application module to load configuration from environment variables, initializes the retriever and LLM model and provides methods to update the configuration dynamically. | [12 Factor Config][Link_5.md] | [DotEnv][Link_6.md] |
+| 2 | [AppConfig][Link_4.md] and [Enviornment file][Link_19.md]| Application module to load configuration from environment variables, initializes the retriever and LLM model and provides methods to update the configuration dynamically. | [12 Factor Config][Link_5.md] | [DotEnv][Link_6.md] |
 | 3 | [RagRetriever][Link_7.md] | RAGRetriever class to handle retrieval-augmented generation. It interacts with a vector database to fetch relevant documents based on query similarity. It uses an embedding model to compute text embeddings for similarity comparison. It extracts relevant context and source information from the retrieved documents. | [2 Step RAG][Link_8.md]  | [Langchain Chroma Vectorstore][Link_9.md]  |
 | 4 | [EmbeddingFactory][Link_10.md] | Embedding Factory class to select and return the appropriate embedding function based on the specified model name (Ollama, OpenAI etc) | [Vectorization & Similarity Scoring][Link_11.md] |  [Langchain Embeddings][Link_12.md]|
 | 5 | [DocUploader][Link_13.md]| Manage the database population with embeddings | [Vector Database][Link_14.md] | [Langchain Chroma][Link_15.md] | 
@@ -38,7 +38,7 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
     ```sh
     pip install -r requirements.txt
     ```
-4. **Insert you own Word/XLSX/PDF in /data folder**. You can change this path in ENV file as well
+4. **Insert you own Word/XLSX/PDF in /data folder**. You can change this path in [ENV][Link_19.md] file by changing the property 'DATA_PATH'
 5. **Run once the populate_database script to index the pdf files into the vector db:**
     ```sh
     python DocUploader.py
@@ -68,3 +68,4 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 [Link_16.md]: https://github.com/inbravo/rag-bot/blob/main/llm/llm_factory.py
 [Link_17.md]: https://en.wikipedia.org/wiki/Factory_method_pattern
 [Link_18.md]: https://docs.langchain.com/oss/python/langchain/models
+[Link_19.md]: https://github.com/inbravo/rag-bot/blob/main/.env
