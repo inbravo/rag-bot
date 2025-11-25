@@ -38,7 +38,7 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
     ```sh
     pip install -r requirements.txt
     ```
-4. **Insert you own PDFs in /data folder**
+4. **Insert you own Word/XLSX/PDF in /data folder**. You can change this path in ENV file as well
 5. **Run once the populate_database script to index the pdf files into the vector db:**
     ```sh
     python DocUploader.py
