@@ -1,4 +1,4 @@
-A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answer to questions by scanning the documents (pdf, doc, excel etc.).
+A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answer to queries questions based on the context information available
 
 ## Solution components
 | #  |  Code/File | Purpose   | Design Principle   | Tech Stack  |
@@ -10,10 +10,20 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 | 5 | [DocUploader][Link_13.md]| Manage the database population with embeddings | [Vector Database][Link_14.md] | [Langchain Chroma][Link_15.md] | 
 | 6 | [LLMFactory][Link_16.md] | Factory class to create LLM instances based on model type e.g., 'ollama', 'gpt', 'claude') | [Factory Pattern][Link_17.md] | [Langchain Models][Link_18.md] |
 
-##  System control flow
-<div style="text-align: center;">
-<img src="https://github.com/inbravo/rag-bot/blob/main/images/call-flow.png" alt="call-flow">
-</div>
+## Applicable usecases
+- Option I: supports following use cases scanning the documents (pdf, doc, excel etc.).
+
+    ###  Knoledge management
+    <div style="text-align: center;">
+    <img src="https://github.com/inbravo/rag-bot/blob/main/images/kms.png" alt="call-flow">
+    </div>
+
+- Option II: supports profiling the Salesforce data (Opportunity, Account, Lead, Contact etc.) and providing intelligence
+
+    ###  Saleforce intelligence
+    <div style="text-align: center;">
+    <img src="https://github.com/inbravo/rag-bot/blob/main/images/sfdc.png" alt="call-flow">
+    </div>
 
 ## LLM configuration
 
