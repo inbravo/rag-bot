@@ -11,19 +11,17 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 | 6 | [LLMFactory][Link_16.md] | Factory class to create LLM instances based on model type e.g., 'ollama', 'gpt', 'claude') | [Factory Pattern][Link_17.md] | [Langchain Models][Link_18.md] |
 
 ## Applicable usecases
-- Option I: supports following use cases scanning the documents (pdf, doc, excel etc.).
+### Option I - Knoledge management - supports the scanning of the documents (pdf, doc, excel etc.).
 
-    ###  Knoledge management
-    <div style="text-align: center;">
-    <img src="https://github.com/inbravo/rag-bot/blob/main/images/kms.png" alt="call-flow">
-    </div>
+<div style="text-align: center;">
+<img src="https://github.com/inbravo/rag-bot/blob/main/images/kms.png" alt="call-flow">
+</div>
 
-- Option II: supports profiling the Salesforce data (Opportunity, Account, Lead, Contact etc.) and providing intelligence
+### Option II - Salesforce data (Opportunity, Account, Lead, Contact etc.) intelligence
 
-    ###  Saleforce intelligence
-    <div style="text-align: center;">
-    <img src="https://github.com/inbravo/rag-bot/blob/main/images/sfdc.png" alt="call-flow">
-    </div>
+<div style="text-align: center;">
+<img src="https://github.com/inbravo/rag-bot/blob/main/images/sfdc.png" alt="call-flow">
+</div>
 
 ## LLM configuration
 
