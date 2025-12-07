@@ -106,7 +106,11 @@ def main():
         # Create (or update) the data store
         logger.info("Starting document processing pipeline")
         documents = load_documents()
+
+        # split_documents(documents) uses RecursiveCharacterTextSplitter with chunk size 800 and overlap 80 to break documents into chunks, logging basic stats on chunk sizes.
         chunks = split_documents(documents)
+
+        # Adds or updates document chunks in the Chroma database, avoiding duplicates by checking existing IDs.
         add_to_chroma(chunks, db)
 
         logger.info("=== Database Population Script Completed Successfully ===")
@@ -513,7 +517,7 @@ def get_directory_structure():
     return structure
 
 # Split documents into smaller chunks
-# Returns a list of Document chunksß
+# Returns a list of Document chunks
 def split_documents(documents: list[Document]):
     """
     Splits a list of documents into smaller chunks using a RecursiveCharacterTextSplitter.
@@ -596,7 +600,19 @@ def add_to_chroma(chunks: list[Document], db):
             print(f"➕ Adding new documents: {len(new_chunks)}")
 
             new_chunk_ids = [chunk.metadata["id"] for chunk in new_chunks]
-            db.add_documents(new_chunks, ids=new_chunk_ids)
+
+            # Split the documents into smaller batches
+            batch_size = 5461  # Set to the maximum allowed batch size. Read more here- https://github.com/chroma-core/chroma/issues/1079
+
+            # Process each batch separately
+            for i in range(0, len(new_chunks), batch_size):
+                batch = new_chunks[i:i + batch_size]
+                batch_ids = new_chunk_ids[i:i + batch_size]
+
+                logger.info(f"Adding batch {i+1} of {len(batch)} documents to database")
+
+                # Add the batch to the database
+                db.add_documents(batch, ids=batch_ids)
 
             logger.info("Documents added successfully to Chroma database")
 

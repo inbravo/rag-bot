@@ -160,7 +160,7 @@ class AppConfig:
         os.makedirs(log_dir, exist_ok=True)
         
         # Create log filename with timestamp
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        timestamp = datetime.now().strftime('%Y%m%d')
         log_file = os.path.join(log_dir, f'rag-bot_{timestamp}.log')
         
         # Configure logging

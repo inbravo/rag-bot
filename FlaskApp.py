@@ -7,6 +7,9 @@ from AppConfig import AppConfig
 # Initial components
 AppConfig.initialize_components()
 
+# Setup logging
+logger = AppConfig.get_default_logger(__name__)
+
 # Initialize Flask app
 app = Flask(__name__)
 
@@ -31,6 +34,7 @@ def admin():
 @app.route("/update_settings", methods=["POST"])
 def update_settings():
 
+    logger.info("Updating application settings...")
     # Reinitialize the components (llm and retriever objects)
     AppConfig.update_components(
         request.form["llm_model_name"],
@@ -49,15 +53,25 @@ def update_settings():
 # Define route to handle user queriesß
 @app.route("/query", methods=["POST"])
 def query():
-    query_text = request.json["query_text"]
 
+    # Extract query text from request
+    query_text = request.json["query_text"]
+    logger.info("Received user query: %s", query_text)
+
+    # Retrieve relevant documents
     results = AppConfig.rag_retriever.query(query_text, k=AppConfig.NUM_RELEVANT_DOCS)
+    logger.info("Received RAG Response: %s", results)
+
+    # Format retrieved results
     enhanced_context_text, sources = AppConfig.rag_retriever.format_results(results)
+    logger.info("Received Formatted RAG Response: %s", results)
 
     # Generate response from LLM
     llm_response = AppConfig.llm_model.generate_response(
         context=enhanced_context_text, question=query_text
     )
+
+    logger.info("Received LLM Response: %s", llm_response)
 
     sources_html = "<br>".join(sources)
     response_text = f"{llm_response}<br><br>Sources:<br>{sources_html}<br><br>Response given by: {AppConfig.LLM_MODEL_NAME}"
