@@ -22,19 +22,33 @@ app = Flask(__name__)
 
 # Configure Flask-Session with Redis backend
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', 'dev-secret-key-change-in-production')
+if app.config['SECRET_KEY'] == 'dev-secret-key-change-in-production' and not app.debug:
+    logger.warning("WARNING: Using default SECRET_KEY in non-debug mode. Set FLASK_SECRET_KEY environment variable!")
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'session:'
 
 # Initialize Redis client for session storage and conversation history
-redis_client = redis.Redis(
-    host=os.environ.get('REDIS_HOST', 'localhost'),
-    port=int(os.environ.get('REDIS_PORT', 6379)),
-    db=int(os.environ.get('REDIS_DB', 0)),
-    password=os.environ.get('REDIS_PASSWORD', None),
-    decode_responses=True
-)
+try:
+    redis_client = redis.Redis(
+        host=os.environ.get('REDIS_HOST', 'localhost'),
+        port=int(os.environ.get('REDIS_PORT', 6379)),
+        db=int(os.environ.get('REDIS_DB', 0)),
+        password=os.environ.get('REDIS_PASSWORD', None),
+        decode_responses=True
+    )
+    # Test Redis connection
+    redis_client.ping()
+    logger.info("Successfully connected to Redis at %s:%s", 
+                os.environ.get('REDIS_HOST', 'localhost'), 
+                os.environ.get('REDIS_PORT', 6379))
+except redis.ConnectionError as e:
+    logger.error("Failed to connect to Redis: %s", str(e))
+    logger.error("Please ensure Redis is running and accessible at %s:%s", 
+                 os.environ.get('REDIS_HOST', 'localhost'), 
+                 os.environ.get('REDIS_PORT', 6379))
+    raise
 
 # Set Redis client for Flask-Session
 app.config['SESSION_REDIS'] = redis_client
@@ -82,7 +96,8 @@ def save_message_to_redis(role, text):
     message = json.dumps({"role": role, "text": text})
     redis_client.rpush(key, message)
     
-    # Set TTL on the conversation key
+    # Set or refresh TTL on the conversation key
+    # This extends the conversation lifetime with each new message
     redis_client.expire(key, CONVERSATION_TTL_SECONDS)
     
     logger.info("Saved %s message to Redis for session %s", role, sid)
