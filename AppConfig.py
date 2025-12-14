@@ -210,7 +210,7 @@ class AppConfig:
                 host=AppConfig.REDIS_HOST,
                 port=AppConfig.REDIS_PORT,
                 db=AppConfig.REDIS_DB,
-                password=AppConfig.REDIS_PASSWORD if AppConfig.REDIS_PASSWORD else None,
+                password=AppConfig.REDIS_PASSWORD or None,
                 decode_responses=True
             )
         return AppConfig.redis_client

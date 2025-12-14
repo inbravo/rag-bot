@@ -1,6 +1,7 @@
 # amit.dixit@inbravo
 # Flask web application to interact with LLM and RAG retriever
 # This app provides an interface to submit queries, view responses, and manage settings.
+import uuid
 from flask import Flask, jsonify, redirect, render_template, request, url_for, session
 from flask_session import Session
 from AppConfig import AppConfig
@@ -30,7 +31,6 @@ Session(app)
 def index():
     # Initialize session if needed
     if 'session_id' not in session:
-        import uuid
         session['session_id'] = str(uuid.uuid4())
         logger.info(f"Created new session: {session['session_id']}")
     return render_template("index.html")
@@ -67,13 +67,12 @@ def update_settings():
     )
     return redirect(url_for("admin"))
 
-# Define route to handle user queriesß
+# Define route to handle user queries
 @app.route("/query", methods=["POST"])
 def query():
     # Get session ID
     session_id = session.get('session_id')
     if not session_id:
-        import uuid
         session_id = str(uuid.uuid4())
         session['session_id'] = session_id
         logger.info(f"Created new session in query: {session_id}")
