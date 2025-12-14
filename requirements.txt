@@ -1,5 +1,6 @@
 # Core libraries (testing etc.)
 pytest
+python-dotenv
 
 # Libraries for web framework and PDF handling
 flask
