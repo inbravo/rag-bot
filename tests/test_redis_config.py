@@ -72,7 +72,7 @@ class TestAppConfigRedis(unittest.TestCase):
         key = AppConfig.conv_key(sid)
         self.assertEqual(key, f"conv:{sid}")
 
-    @patch('AppConfig.redis.Redis')
+    @patch('redis.Redis')
     @patch('AppConfig.LLMFactory')
     @patch('AppConfig.RAGRetriever')
     def test_redis_client_method(self, mock_retriever, mock_llm, mock_redis_cls):

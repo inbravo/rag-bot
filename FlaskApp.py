@@ -57,7 +57,10 @@ else:
 
 # Helper functions for session and conversation management
 def get_session_id():
-    """Get or create a session ID for the current user session."""
+    """
+    Get or create a session ID for the current user session.
+    Note: Must be called within a Flask request context.
+    """
     if 'sid' not in session:
         import uuid
         session['sid'] = str(uuid.uuid4())
@@ -77,8 +80,7 @@ def save_message_to_redis(sid, role, content):
         key = conv_key(sid)
         message = json.dumps({"role": role, "content": content})
         redis_client.rpush(key, message)
-        ttl = getattr(AppConfig, 'CONVERSATION_TTL_SECONDS', int(os.getenv("CONVERSATION_TTL_SECONDS", "86400")))
-        redis_client.expire(key, ttl)
+        redis_client.expire(key, AppConfig.CONVERSATION_TTL_SECONDS)
     except Exception as e:
         logger.warning(f"Failed to save message to Redis: {e}")
 
