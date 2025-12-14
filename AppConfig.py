@@ -263,7 +263,11 @@ class AppConfig:
             for msg in messages:
                 try:
                     data = json.loads(msg)
-                    parsed_messages.append((data.get("role", ""), data.get("message", "")))
+                    role = data.get("role")
+                    message = data.get("message")
+                    # Only add if both role and message exist and are non-empty
+                    if role and message:
+                        parsed_messages.append((role, message))
                 except json.JSONDecodeError:
                     # Skip invalid messages
                     continue
