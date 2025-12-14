@@ -89,18 +89,22 @@ def save_message_to_redis(role, text):
         role: Message role ('user' or 'bot')
         text: Message text content
     """
-    sid = get_session_id()
-    key = conv_key(sid)
-    
-    # Store message as JSON string in Redis list
-    message = json.dumps({"role": role, "text": text})
-    redis_client.rpush(key, message)
-    
-    # Set or refresh TTL on the conversation key
-    # This extends the conversation lifetime with each new message
-    redis_client.expire(key, CONVERSATION_TTL_SECONDS)
-    
-    logger.info("Saved %s message to Redis for session %s", role, sid)
+    try:
+        sid = get_session_id()
+        key = conv_key(sid)
+        
+        # Store message as JSON string in Redis list
+        message = json.dumps({"role": role, "text": text})
+        redis_client.rpush(key, message)
+        
+        # Set or refresh TTL on the conversation key
+        # This extends the conversation lifetime with each new message
+        redis_client.expire(key, CONVERSATION_TTL_SECONDS)
+        
+        logger.info("Saved %s message to Redis for session %s", role, sid)
+    except redis.RedisError as e:
+        logger.error("Failed to save message to Redis: %s", str(e))
+        # Don't raise - allow the application to continue even if history storage fails
 
 # Helper function to load conversation from Redis
 def load_conversation_from_redis():
@@ -109,22 +113,26 @@ def load_conversation_from_redis():
     Returns:
         List of message dictionaries with 'role' and 'text' keys
     """
-    sid = get_session_id()
-    key = conv_key(sid)
-    
-    # Retrieve all messages from Redis list
-    messages = redis_client.lrange(key, 0, -1)
-    
-    # Parse JSON messages
-    conversation = []
-    for msg in messages:
-        try:
-            conversation.append(json.loads(msg))
-        except json.JSONDecodeError:
-            logger.error("Failed to parse message from Redis: %s", msg)
-    
-    logger.info("Loaded %d messages from Redis for session %s", len(conversation), sid)
-    return conversation
+    try:
+        sid = get_session_id()
+        key = conv_key(sid)
+        
+        # Retrieve all messages from Redis list
+        messages = redis_client.lrange(key, 0, -1)
+        
+        # Parse JSON messages
+        conversation = []
+        for msg in messages:
+            try:
+                conversation.append(json.loads(msg))
+            except json.JSONDecodeError:
+                logger.error("Failed to parse message from Redis: %s", msg)
+        
+        logger.info("Loaded %d messages from Redis for session %s", len(conversation), sid)
+        return conversation
+    except redis.RedisError as e:
+        logger.error("Failed to load conversation from Redis: %s", str(e))
+        return []  # Return empty list if Redis is unavailable
 
 # Define routes
 @app.route("/")
@@ -214,11 +222,15 @@ def clear_conversation():
     """
     Endpoint to clear conversation history for the current session.
     """
-    sid = get_session_id()
-    key = conv_key(sid)
-    redis_client.delete(key)
-    logger.info("Cleared conversation history for session %s", sid)
-    return jsonify(success=True)
+    try:
+        sid = get_session_id()
+        key = conv_key(sid)
+        redis_client.delete(key)
+        logger.info("Cleared conversation history for session %s", sid)
+        return jsonify(success=True)
+    except redis.RedisError as e:
+        logger.error("Failed to clear conversation from Redis: %s", str(e))
+        return jsonify(success=False, error="Failed to clear conversation history"), 500
 
 # Run the Flask app
 if __name__ == "__main__":
