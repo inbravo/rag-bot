@@ -5,6 +5,7 @@
 
 import os
 import uuid
+import json
 import redis
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from flask_session import Session
@@ -78,7 +79,6 @@ def save_message_to_redis(role, text):
     key = conv_key(sid)
     
     # Store message as JSON string in Redis list
-    import json
     message = json.dumps({"role": role, "text": text})
     redis_client.rpush(key, message)
     
@@ -101,7 +101,6 @@ def load_conversation_from_redis():
     messages = redis_client.lrange(key, 0, -1)
     
     # Parse JSON messages
-    import json
     conversation = []
     for msg in messages:
         try:
