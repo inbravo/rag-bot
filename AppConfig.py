@@ -1,5 +1,6 @@
 import os
 import logging
+import json
 from datetime import datetime
 from dotenv import load_dotenv, set_key
 from llm.llm_factory import LLMFactory
@@ -206,13 +207,20 @@ class AppConfig:
             redis.Redis: Redis client instance
         """
         if AppConfig.redis_client is None:
-            AppConfig.redis_client = redis.Redis(
-                host=AppConfig.REDIS_HOST,
-                port=AppConfig.REDIS_PORT,
-                db=AppConfig.REDIS_DB,
-                password=AppConfig.REDIS_PASSWORD or None,
-                decode_responses=True
-            )
+            try:
+                AppConfig.redis_client = redis.Redis(
+                    host=AppConfig.REDIS_HOST,
+                    port=AppConfig.REDIS_PORT,
+                    db=AppConfig.REDIS_DB,
+                    password=AppConfig.REDIS_PASSWORD or None,
+                    decode_responses=True
+                )
+                # Test the connection
+                AppConfig.redis_client.ping()
+            except Exception as e:
+                logger = AppConfig.get_default_logger(__name__)
+                logger.error(f"Failed to connect to Redis: {e}")
+                raise
         return AppConfig.redis_client
 
     # Save conversation message to Redis
@@ -225,10 +233,15 @@ class AppConfig:
             role (str): Message role ('user' or 'assistant')
             message (str): Message content
         """
-        redis_client = AppConfig.get_redis_client()
-        key = f"conv:{session_id}"
-        redis_client.rpush(key, f"{role}:{message}")
-        redis_client.expire(key, AppConfig.CONVERSATION_TTL_SECONDS)
+        try:
+            redis_client = AppConfig.get_redis_client()
+            key = f"conv:{session_id}"
+            message_data = json.dumps({"role": role, "message": message})
+            redis_client.rpush(key, message_data)
+            redis_client.expire(key, AppConfig.CONVERSATION_TTL_SECONDS)
+        except Exception as e:
+            logger = AppConfig.get_default_logger(__name__)
+            logger.error(f"Failed to save conversation message to Redis: {e}")
 
     # Get conversation history from Redis
     @staticmethod
@@ -240,15 +253,23 @@ class AppConfig:
         Returns:
             list: List of conversation messages as tuples (role, message)
         """
-        redis_client = AppConfig.get_redis_client()
-        key = f"conv:{session_id}"
-        messages = redis_client.lrange(key, 0, -1)
-        
-        # Parse messages into tuples of (role, message)
-        parsed_messages = []
-        for msg in messages:
-            if ':' in msg:
-                role, content = msg.split(':', 1)
-                parsed_messages.append((role, content))
-        
-        return parsed_messages
+        try:
+            redis_client = AppConfig.get_redis_client()
+            key = f"conv:{session_id}"
+            messages = redis_client.lrange(key, 0, -1)
+            
+            # Parse messages from JSON
+            parsed_messages = []
+            for msg in messages:
+                try:
+                    data = json.loads(msg)
+                    parsed_messages.append((data.get("role", ""), data.get("message", "")))
+                except json.JSONDecodeError:
+                    # Skip invalid messages
+                    continue
+            
+            return parsed_messages
+        except Exception as e:
+            logger = AppConfig.get_default_logger(__name__)
+            logger.error(f"Failed to retrieve conversation history from Redis: {e}")
+            return []

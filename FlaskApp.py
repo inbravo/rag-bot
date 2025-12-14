@@ -78,7 +78,10 @@ def query():
         logger.info(f"Created new session in query: {session_id}")
 
     # Extract query text from request
-    query_text = request.json["query_text"]
+    query_text = request.json.get("query_text")
+    if not query_text:
+        return jsonify(error="query_text is required"), 400
+    
     logger.info("Received user query: %s", query_text)
 
     # Save user message to conversation history
