@@ -3,7 +3,7 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 ## Solution components
 | #  |  Code/File | Purpose   | Design Principle   | Tech Stack  |
 |---|---|---|---|---|
-| 1 | [FlaskApp][Link_1.md] |  Server side to manage user request from web browser | [WSGI][Link_2.md] |  [Flask][Link_3.md] |
+| 1 | [FlaskApp][Link_1.md] |  Server side to manage user request from web browser with Redis-backed session management and conversation history | [WSGI][Link_2.md] |  [Flask][Link_3.md], [Flask-Session][Link_20.md], [Redis][Link_21.md] |
 | 2 | [AppConfig][Link_4.md] and [Enviornment file][Link_19.md]| Application module to load configuration from environment variables, initializes the retriever and LLM model and provides methods to update the configuration dynamically. | [12 Factor Config][Link_5.md] | [DotEnv][Link_6.md] |
 | 3 | [RagRetriever][Link_7.md] | RAGRetriever class to handle retrieval-augmented generation. It interacts with a vector database to fetch relevant documents based on query similarity. It uses an embedding model to compute text embeddings for similarity comparison. It extracts relevant context and source information from the retrieved documents. | [2 Step RAG][Link_8.md]  | [Langchain Chroma Vectorstore][Link_9.md]  |
 | 4 | [EmbeddingFactory][Link_10.md] | Embedding Factory class to select and return the appropriate embedding function based on the specified model name (Ollama, OpenAI etc) | [Vectorization & Similarity Scoring][Link_11.md] |  [Langchain Embeddings][Link_12.md]|
@@ -32,31 +32,57 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 | 3 | Use Anthropic API for Claude Models | **Set up Anthropic API**: you can sign up and get your API key from [Anthropic's website](https://www.anthropic.com/api). | 
 
 ## Code repo setup and build
-1. **Clone the repository and navigate to the project directory**:
+1. **Install Redis** (required for session management and conversation history):
+    - **Linux/macOS**: 
+        ```sh
+        # Ubuntu/Debian
+        sudo apt-get install redis-server
+        sudo systemctl start redis
+        
+        # macOS with Homebrew
+        brew install redis
+        brew services start redis
+        ```
+    - **Windows**: Download and install from [Redis Windows releases](https://github.com/microsoftarchive/redis/releases) or use WSL
+    - **Docker**:
+        ```sh
+        docker run -d -p 6379:6379 redis:latest
+        ```
+2. **Clone the repository and navigate to the project directory**:
     ```sh
     git clone https://github.com/inbravo/rag-bot.git
     cd rag-bot
     ```
-2. **Create a virtual environment**:
+3. **Create a virtual environment**:
     ```sh
     python -m venv venv
     source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
     ```
-3. **Install the required libraries**:
+4. **Install the required libraries**:
     ```sh
     pip install -r requirements.txt
     ```
-4. **Insert you own Word/XLSX/PDF in /data folder**. You can change this path in [ENV][Link_19.md] file by changing the property 'DATA_PATH'
-5. **Run once the populate_database script to index the pdf files into the vector db:**
+5. **Configure Redis connection** (optional if using defaults):
+    - Edit the `.env` file to set Redis configuration:
+        ```sh
+        REDIS_HOST=localhost
+        REDIS_PORT=6379
+        REDIS_DB=0
+        REDIS_PASSWORD=  # Leave empty if no password
+        FLASK_SECRET_KEY=your-secret-key-here  # Change in production
+        CONVERSATION_TTL_SECONDS=3600  # Conversation expiry time
+        ```
+6. **Insert you own Word/XLSX/PDF in /data folder**. You can change this path in [ENV][Link_19.md] file by changing the property 'DATA_PATH'
+7. **Run once the populate_database script to index the pdf files into the vector db:**
     ```sh
     python DocUploader.py
     ```
-6. **Run the application:**
+8. **Run the application:**
     ```sh
     python FlaskApp.py
     ```
-7. Navigate to **`http://localhost:5000/`** and If needed, click on ⚙️ icon to access the admin panel and adjust app parameters
-9. Perform a query and Chatbot will reply the best answer
+9. Navigate to **`http://localhost:5000/`** and If needed, click on ⚙️ icon to access the admin panel and adjust app parameters
+10. Perform a query and Chatbot will reply the best answer
 
 [Link_1.md]: https://github.com/inbravo/rag-bot/blob/main/FlaskApp.py
 [Link_2.md]: https://flask.palletsprojects.com/en/stable/design
@@ -77,3 +103,5 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 [Link_17.md]: https://en.wikipedia.org/wiki/Factory_method_pattern
 [Link_18.md]: https://docs.langchain.com/oss/python/langchain/models
 [Link_19.md]: https://github.com/inbravo/rag-bot/blob/main/.env
+[Link_20.md]: https://flask-session.readthedocs.io/
+[Link_21.md]: https://redis.io/
