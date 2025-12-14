@@ -31,13 +31,22 @@ REDIS_DB = int(os.environ.get("REDIS_DB", 0))
 REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD", None)
 
 # Redis client used for both Flask-Session and direct conversation storage
-redis_client = redis.Redis(
-    host=REDIS_HOST, 
-    port=REDIS_PORT, 
-    db=REDIS_DB, 
-    password=REDIS_PASSWORD, 
-    decode_responses=True
-)
+try:
+    redis_client = redis.Redis(
+        host=REDIS_HOST, 
+        port=REDIS_PORT, 
+        db=REDIS_DB, 
+        password=REDIS_PASSWORD, 
+        decode_responses=True,
+        socket_connect_timeout=5
+    )
+    # Test connection
+    redis_client.ping()
+    logger.info("Redis connection established successfully")
+except redis.ConnectionError as e:
+    logger.error(f"Failed to connect to Redis at {REDIS_HOST}:{REDIS_PORT} - {e}")
+    logger.error("Session management will not work without Redis. Please ensure Redis is running.")
+    raise
 
 # Flask-Session config (server-side sessions)
 app.config["SESSION_TYPE"] = "redis"
@@ -160,7 +169,7 @@ def chat():
     """
     data = request.get_json()
     if not data or 'text' not in data:
-        return jsonify({'error': 'text required'}), 400
+        return jsonify({'error': 'Missing required field: text'}), 400
 
     user_text = data['text']
     logger.info("Chat request - session: %s, text: %s", get_session_id(), user_text)
@@ -208,8 +217,10 @@ def chat():
         
         logger.info("Generated assistant reply: %s", assistant_reply)
     except Exception as e:
-        logger.error("Error in RAG pipeline: %s", str(e))
-        assistant_reply = f"[Error processing request: {str(e)}]"
+        # Log full error details for debugging
+        logger.error("Error in RAG pipeline: %s", str(e), exc_info=True)
+        # Return generic error message to client for security
+        assistant_reply = "I apologize, but I encountered an error processing your request. Please try again later."
 
     # Save assistant reply to conversation history
     save_message_to_redis('assistant', assistant_reply)
