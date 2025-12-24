@@ -1,7 +1,9 @@
 # amit.dixit@inbravo
 # Flask web application to interact with LLM and RAG retriever
 # This app provides an interface to submit queries, view responses, and manage settings.
-from flask import Flask, jsonify, redirect, render_template, request, url_for
+import json
+import os
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from AppConfig import AppConfig
 
 # Initial components
@@ -12,6 +14,87 @@ logger = AppConfig.get_default_logger(__name__)
 
 # Initialize Flask app
 app = Flask(__name__)
+
+# Try to initialize Redis client using AppConfig helper
+redis_client = None
+if hasattr(AppConfig, 'redis_client'):
+    redis_client = AppConfig.redis_client()
+else:
+    # Fallback to environment-based config if helper not present
+    try:
+        import redis
+        redis_host = os.getenv("REDIS_HOST", "localhost")
+        redis_port = int(os.getenv("REDIS_PORT", "6379"))
+        redis_db = int(os.getenv("REDIS_DB", "0"))
+        redis_password = os.getenv("REDIS_PASSWORD", None)
+        redis_client = redis.Redis(
+            host=redis_host,
+            port=redis_port,
+            db=redis_db,
+            password=redis_password,
+            decode_responses=True
+        )
+    except (ImportError, Exception) as e:
+        logger.warning(f"Redis client initialization failed: {e}")
+
+# Apply session configuration using AppConfig helper or fallback
+if hasattr(AppConfig, 'apply_session_config'):
+    AppConfig.apply_session_config(app, redis_client)
+else:
+    # Fallback to basic configuration
+    from datetime import timedelta
+    app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-key-change-in-production")
+    if redis_client is not None:
+        try:
+            from flask_session import Session
+            app.config['SESSION_TYPE'] = 'redis'
+            app.config['SESSION_REDIS'] = redis_client
+            app.config['SESSION_PERMANENT'] = True
+            app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=int(os.getenv("SESSION_LIFETIME_DAYS", "7")))
+            Session(app)
+        except ImportError:
+            logger.warning("Flask-Session not available, using default sessions")
+
+# Helper functions for session and conversation management
+def get_session_id():
+    """
+    Get or create a session ID for the current user session.
+    Note: Must be called within a Flask request context.
+    """
+    if 'sid' not in session:
+        import uuid
+        session['sid'] = str(uuid.uuid4())
+    return session['sid']
+
+def conv_key(sid):
+    """Generate Redis key for conversation storage."""
+    if hasattr(AppConfig, 'conv_key'):
+        return AppConfig.conv_key(sid)
+    return f"conv:{sid}"
+
+def save_message_to_redis(sid, role, content):
+    """Save a message to Redis conversation history."""
+    if redis_client is None:
+        return
+    try:
+        key = conv_key(sid)
+        message = json.dumps({"role": role, "content": content})
+        redis_client.rpush(key, message)
+        redis_client.expire(key, AppConfig.CONVERSATION_TTL_SECONDS)
+    except Exception as e:
+        logger.warning(f"Failed to save message to Redis: {e}")
+
+def load_conversation_from_redis(sid):
+    """Load conversation history from Redis."""
+    if redis_client is None:
+        return []
+    try:
+        key = conv_key(sid)
+        messages = redis_client.lrange(key, 0, -1)
+        return [json.loads(msg) for msg in messages]
+    except Exception as e:
+        logger.warning(f"Failed to load conversation from Redis: {e}")
+        return []
 
 # Define routes
 @app.route("/")
@@ -54,9 +137,15 @@ def update_settings():
 @app.route("/query", methods=["POST"])
 def query():
 
+    # Get session ID
+    sid = get_session_id()
+
     # Extract query text from request
     query_text = request.json["query_text"]
     logger.info("Received user query: %s", query_text)
+
+    # Save user message to Redis
+    save_message_to_redis(sid, "user", query_text)
 
     # Retrieve relevant documents
     results = AppConfig.rag_retriever.query(query_text, k=AppConfig.NUM_RELEVANT_DOCS)
@@ -75,6 +164,10 @@ def query():
 
     sources_html = "<br>".join(sources)
     response_text = f"{llm_response}<br><br>Sources:<br>{sources_html}<br><br>Response given by: {AppConfig.LLM_MODEL_NAME}"
+    
+    # Save assistant response to Redis
+    save_message_to_redis(sid, "assistant", llm_response)
+    
     return jsonify(response=response_text)
 
 # Run the Flask app

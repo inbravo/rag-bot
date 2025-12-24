@@ -67,9 +67,18 @@ class AppConfig:
     LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME")
     LLM_MODEL_TYPE = os.getenv("LLM_MODEL_TYPE")
     EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME")
-    NUM_RELEVANT_DOCS = int(os.getenv("NUM_RELEVANT_DOCS"))
+    NUM_RELEVANT_DOCS = int(os.getenv("NUM_RELEVANT_DOCS", "5"))
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
+
+    # Redis and session configuration
+    REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+    REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+    REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+    REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)
+    CONVERSATION_TTL_SECONDS = int(os.getenv("CONVERSATION_TTL_SECONDS", "86400"))
+    SESSION_LIFETIME_DAYS = int(os.getenv("SESSION_LIFETIME_DAYS", "7"))
+    FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "dev-secret-key-change-in-production")
 
     # Initialize RAG components: retriever and LLM model
     @staticmethod
@@ -186,3 +195,62 @@ class AppConfig:
 
         # Return named logger or default logger
         return logging.getLogger(name) if name else logging.getLogger()
+
+    # Redis client helper
+    @classmethod
+    def redis_client(cls):
+        """
+        Create and return a Redis client instance based on configuration.
+        Returns None if redis module is not available.
+        """
+        try:
+            import redis
+            client = redis.Redis(
+                host=cls.REDIS_HOST,
+                port=cls.REDIS_PORT,
+                db=cls.REDIS_DB,
+                password=cls.REDIS_PASSWORD,
+                decode_responses=True
+            )
+            return client
+        except ImportError:
+            return None
+        except Exception as e:
+            logging.getLogger(__name__).warning(f"Failed to create Redis client: {e}")
+            return None
+
+    # Apply session configuration to Flask app
+    @classmethod
+    def apply_session_config(cls, app, redis_client=None):
+        """
+        Apply session configuration to the Flask app.
+        Args:
+            app: Flask application instance
+            redis_client: Optional Redis client instance
+        """
+        from datetime import timedelta
+        
+        app.secret_key = cls.FLASK_SECRET_KEY
+        
+        if redis_client is not None:
+            try:
+                from flask_session import Session
+                app.config['SESSION_TYPE'] = 'redis'
+                app.config['SESSION_REDIS'] = redis_client
+                app.config['SESSION_PERMANENT'] = True
+                app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=cls.SESSION_LIFETIME_DAYS)
+                Session(app)
+            except ImportError:
+                logging.getLogger(__name__).warning("Flask-Session not available, using default sessions")
+
+    # Generate conversation key for Redis
+    @staticmethod
+    def conv_key(sid):
+        """
+        Generate a Redis key for storing conversation history.
+        Args:
+            sid: Session ID
+        Returns:
+            str: Redis key in format 'conv:<sid>'
+        """
+        return f"conv:{sid}"

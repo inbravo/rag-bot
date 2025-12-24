@@ -1,8 +1,11 @@
 # Core libraries (testing etc.)
 pytest
+python-dotenv
 
 # Libraries for web framework and PDF handling
 flask
+flask-session
+redis
 pypdf
 
 # Libraries for LangChain and vector databases
