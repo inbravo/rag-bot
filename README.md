@@ -37,26 +37,57 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
     git clone https://github.com/inbravo/rag-bot.git
     cd rag-bot
     ```
-2. **Create a virtual environment**:
+2. **Install and start Redis** (required for session management):
+    - **Linux/Mac**: 
+      ```sh
+      # Install Redis
+      # Ubuntu/Debian: sudo apt-get install redis-server
+      # Mac: brew install redis
+      
+      # Start Redis
+      redis-server
+      ```
+    - **Windows**: Download and install Redis from [Redis Windows releases](https://github.com/microsoftarchive/redis/releases)
+    - **Docker**: 
+      ```sh
+      docker run -d -p 6379:6379 redis:latest
+      ```
+3. **Create a virtual environment**:
     ```sh
     python -m venv venv
     source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
     ```
-3. **Install the required libraries**:
+4. **Configure environment variables**:
+    - Copy `.env.example` to `.env`:
+      ```sh
+      cp .env.example .env
+      ```
+    - Update the `.env` file with your configuration:
+      - Set your API keys (OPENAI_API_KEY, CLAUDE_API_KEY)
+      - Configure Redis connection if using non-default settings (REDIS_HOST, REDIS_PORT, etc.)
+      - Set a secure FLASK_SECRET_KEY for production use
+5. **Install the required libraries**:
     ```sh
     pip install -r requirements.txt
     ```
-4. **Insert you own Word/XLSX/PDF in /data folder**. You can change this path in [ENV][Link_19.md] file by changing the property 'DATA_PATH'
-5. **Run once the populate_database script to index the pdf files into the vector db:**
+6. **Insert your own Word/XLSX/PDF in /data folder**. You can change this path in [ENV][Link_19.md] file by changing the property 'DATA_PATH'
+7. **Run once the populate_database script to index the pdf files into the vector db:**
     ```sh
     python DocUploader.py
     ```
-6. **Run the application:**
+8. **Run the application:**
     ```sh
     python FlaskApp.py
     ```
-7. Navigate to **`http://localhost:5000/`** and If needed, click on ⚙️ icon to access the admin panel and adjust app parameters
-9. Perform a query and Chatbot will reply the best answer
+9. Navigate to **`http://localhost:5000/`** and If needed, click on ⚙️ icon to access the admin panel and adjust app parameters
+10. Perform a query and Chatbot will reply the best answer
+
+## Session Management
+The application uses Redis-backed server-side sessions to maintain conversation history:
+- Each user session is assigned a unique session ID
+- Conversation messages (both user queries and assistant responses) are stored in Redis
+- Session data expires after 24 hours (configurable via CONVERSATION_TTL_SECONDS)
+- Redis must be running for the application to function properly
 
 [Link_1.md]: https://github.com/inbravo/rag-bot/blob/main/FlaskApp.py
 [Link_2.md]: https://flask.palletsprojects.com/en/stable/design

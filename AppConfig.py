@@ -1,9 +1,11 @@
 import os
 import logging
+import json
 from datetime import datetime
 from dotenv import load_dotenv, set_key
 from llm.llm_factory import LLMFactory
 from retrieval.RAGRetriever import RAGRetriever
+import redis
 
 # Load environment variables from .env file
 load_dotenv()
@@ -51,6 +53,7 @@ class AppConfig:
     rag_retriever = None
     llm_model = None
     logger = None
+    redis_client = None
 
     # Load configuration from environment variables
     ENV_PATH = ".env"
@@ -70,6 +73,14 @@ class AppConfig:
     NUM_RELEVANT_DOCS = int(os.getenv("NUM_RELEVANT_DOCS"))
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
+
+    # Redis and session configuration
+    REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+    REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+    REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+    REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "")
+    FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "dev-secret-key-change-in-production")
+    CONVERSATION_TTL_SECONDS = int(os.getenv("CONVERSATION_TTL_SECONDS", "86400"))
 
     # Initialize RAG components: retriever and LLM model
     @staticmethod
@@ -186,3 +197,83 @@ class AppConfig:
 
         # Return named logger or default logger
         return logging.getLogger(name) if name else logging.getLogger()
+
+    # Get or initialize Redis client
+    @staticmethod
+    def get_redis_client():
+        """
+        Get or create a Redis client instance.
+        Returns:
+            redis.Redis: Redis client instance
+        """
+        if AppConfig.redis_client is None:
+            try:
+                AppConfig.redis_client = redis.Redis(
+                    host=AppConfig.REDIS_HOST,
+                    port=AppConfig.REDIS_PORT,
+                    db=AppConfig.REDIS_DB,
+                    password=AppConfig.REDIS_PASSWORD or None,
+                    decode_responses=True
+                )
+                # Test the connection
+                AppConfig.redis_client.ping()
+            except Exception as e:
+                logger = AppConfig.get_default_logger(__name__)
+                logger.error(f"Failed to connect to Redis: {e}")
+                raise
+        return AppConfig.redis_client
+
+    # Save conversation message to Redis
+    @staticmethod
+    def save_conversation_message(session_id: str, role: str, message: str):
+        """
+        Save a conversation message to Redis.
+        Args:
+            session_id (str): Session identifier
+            role (str): Message role ('user' or 'assistant')
+            message (str): Message content
+        """
+        try:
+            redis_client = AppConfig.get_redis_client()
+            key = f"conv:{session_id}"
+            message_data = json.dumps({"role": role, "message": message})
+            redis_client.rpush(key, message_data)
+            redis_client.expire(key, AppConfig.CONVERSATION_TTL_SECONDS)
+        except Exception as e:
+            logger = AppConfig.get_default_logger(__name__)
+            logger.error(f"Failed to save conversation message to Redis: {e}")
+
+    # Get conversation history from Redis
+    @staticmethod
+    def get_conversation_history(session_id: str):
+        """
+        Get conversation history from Redis.
+        Args:
+            session_id (str): Session identifier
+        Returns:
+            list: List of conversation messages as tuples (role, message)
+        """
+        try:
+            redis_client = AppConfig.get_redis_client()
+            key = f"conv:{session_id}"
+            messages = redis_client.lrange(key, 0, -1)
+            
+            # Parse messages from JSON
+            parsed_messages = []
+            for msg in messages:
+                try:
+                    data = json.loads(msg)
+                    role = data.get("role")
+                    message = data.get("message")
+                    # Only add if both role and message exist and contain meaningful content
+                    if role and role.strip() and message and message.strip():
+                        parsed_messages.append((role, message))
+                except json.JSONDecodeError:
+                    # Skip invalid messages
+                    continue
+            
+            return parsed_messages
+        except Exception as e:
+            logger = AppConfig.get_default_logger(__name__)
+            logger.error(f"Failed to retrieve conversation history from Redis: {e}")
+            return []
