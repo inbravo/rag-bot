@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Dict
 
-from langchain.schema import Document
+from langchain_core.documents import Document
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import (
     CSVLoader,

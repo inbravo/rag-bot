@@ -1,5 +1,5 @@
 from typing import List, Tuple, Dict, Any
-from langchain.schema import Document
+from langchain_core.documents import Document
 from retrieval.RAGRetriever import RAGRetriever
 
 # AcordSearcher class for specialized ACORD standard searching
