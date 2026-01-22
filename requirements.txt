@@ -15,3 +15,7 @@ chromadb # vector db
 boto3
 anthropic
 openai
+
+# Database libraries for schema inspection and connectivity
+sqlalchemy
+pyodbc  # Optional: For MSSQL connectivity (requires ODBC driver installed on system)

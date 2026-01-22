@@ -1,6 +1,65 @@
-A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answer to queries questions based on the context information available
+A Python-based Retrieval-Augmented Generation (RAG) application that has been transformed into a **Data Model Harmonizer** for automating semantic data mapping from operational databases to industry standards (e.g., MSSQL → ACORD).
 
-## Solution components
+## ✨ What's New: Data Model Harmonizer
+
+This codebase now supports **three distinct use cases**:
+
+1. **Document Q&A** (Original) - Answer questions based on indexed documents
+2. **Semantic Data Mapping** (NEW) - Map database columns to ACORD standards using LLM reasoning
+3. **Code Generation** (NEW) - Generate PySpark ETL scripts from approved mappings
+
+### 🚀 Quick Links
+
+- **🏃 Getting Started?** → Read [INDEX.md](INDEX.md) or [QUICKSTART.md](QUICKSTART.md)
+- **📚 Full Architecture?** → See [HARMONIZER_ARCHITECTURE.md](HARMONIZER_ARCHITECTURE.md)
+- **🔧 API Reference?** → Check [MODULES_REFERENCE.md](MODULES_REFERENCE.md)
+- **📊 Implementation Status?** → View [IMPLEMENTATION_CHECKLIST.md](IMPLEMENTATION_CHECKLIST.md)
+- **💡 Working Example?** → Run [examples_integration_workflow.py](examples_integration_workflow.py)
+
+---
+
+## 🏗️ Architecture: 6-Phase Pipeline
+
+```
+1. EXTRACT   → Pull SQL schema from MSSQL databases
+2. INDEX     → Index ACORD standards, SQL schema, and business dictionaries
+3. GENERATE  → Generate semantic mappings with confidence scores
+4. REVIEW    → Approve/reject mappings in UI or via API
+5. CODEGEN   → Generate PySpark transformation code
+6. RUN       → Execute orchestrated ETL in Databricks/Spark
+```
+
+---
+
+## 🎯 New Capabilities
+
+### Semantic Data Mapping
+- Vector-based similarity search (ChromaDB)
+- LLM chain-of-thought reasoning for mapping decisions
+- Confidence scoring and alternative suggestions
+- Approval workflow with audit trail
+
+### Database Integration
+- Direct MSSQL schema extraction via SQLAlchemy
+- Column-level metadata with descriptions
+- JSON export for metadata indexing
+- Support for multiple databases
+
+### Code Generation
+- PySpark transformation code generation
+- Data quality checks (null handling, type validation)
+- Databricks job orchestration templates
+- Production-ready ETL scripts
+
+### REST API (15+ Endpoints)
+- Mapping CRUD operations
+- Code generation endpoints
+- Search functionality
+- Statistics and reporting
+
+---
+
+## 📦 Solution Components (Original + New)
 | #  |  Code/File | Purpose   | Design Principle   | Tech Stack  |
 |---|---|---|---|---|
 | 1 | [FlaskApp][Link_1.md] |  Server side to manage user request from web browser | [WSGI][Link_2.md] |  [Flask][Link_3.md] |
@@ -11,16 +70,10 @@ A Python based local Retrieval-Augmented Generation (RAG) chatbot that can answe
 | 6 | [LLMFactory][Link_16.md] | Factory class to create LLM instances based on model type e.g., 'ollama', 'gpt', 'claude') | [Factory Pattern][Link_17.md] | [Langchain Models][Link_18.md] |
 
 ## Applicable usecases
-### Option I - Knoledge management - supports the scanning of the documents (pdf, doc, excel etc.).
+### Model Harmonization to ACORD
 
 <div style="text-align: center;">
-<img src="https://github.com/inbravo/rag-bot/blob/main/images/kms.png" alt="call-flow">
-</div>
-
-### Option II - Salesforce data (Opportunity, Account, Lead, Contact etc.) intelligence
-
-<div style="text-align: center;">
-<img src="https://github.com/inbravo/rag-bot/blob/main/images/sfdc.png" alt="call-flow">
+<img src="https://github.com/inbravo/rag-bot/blob/copilot/precious-pigeon/images/model-harmon.png" alt="call-flow">
 </div>
 
 ## LLM configuration

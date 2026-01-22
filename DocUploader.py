@@ -1,9 +1,11 @@
 import argparse
 import os
 import shutil
+import json
 from pathlib import Path
+from typing import Dict
 
-from langchain.schema import Document
+from langchain_core.documents import Document
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import (
     CSVLoader,
@@ -15,6 +17,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from AppConfig import AppConfig
 from embeddings.EmbeddingFactory import EmbeddingFactory
+from retrieval.MetadataLoader import MetadataLoader
 
 # Initial components
 AppConfig.initialize_components()
@@ -776,3 +779,211 @@ def rebuild_database(embedding_model):
 # Entry point
 if __name__ == "__main__":
     main()
+
+
+# ============================================================================
+# NEW: Functions for loading three types of metadata (ACORD, SQL, Dictionary)
+# ============================================================================
+
+def load_acord_standard_from_json(acord_json_path: str) -> Dict:
+    """
+    Load ACORD standard definitions from a JSON file.
+
+    Args:
+        acord_json_path: Path to ACORD JSON file with format:
+        {
+            "entities": [
+                {
+                    "entity_name": "Policy",
+                    "description": "...",
+                    "fields": [...]
+                }
+            ]
+        }
+
+    Returns:
+        Dictionary with ACORD definitions
+    """
+    logger = AppConfig.get_default_logger(__name__)
+    logger.info(f"Loading ACORD standard from: {acord_json_path}")
+
+    try:
+        with open(acord_json_path, 'r') as f:
+            acord_data = json.load(f)
+        logger.info("ACORD standard loaded successfully")
+        return acord_data
+    except Exception as e:
+        logger.error(f"Failed to load ACORD standard: {e}")
+        raise
+
+
+def load_sql_schema_from_json(schema_json_path: str) -> Dict:
+    """
+    Load SQL schema metadata from a JSON file.
+
+    Args:
+        schema_json_path: Path to SQL schema JSON file (from INFORMATION_SCHEMA export)
+
+    Returns:
+        Dictionary with SQL schema metadata
+    """
+    logger = AppConfig.get_default_logger(__name__)
+    logger.info(f"Loading SQL schema metadata from: {schema_json_path}")
+
+    try:
+        with open(schema_json_path, 'r') as f:
+            schema_data = json.load(f)
+        logger.info("SQL schema metadata loaded successfully")
+        return schema_data
+    except Exception as e:
+        logger.error(f"Failed to load SQL schema metadata: {e}")
+        raise
+
+
+def load_customer_dictionary_from_json(dictionary_json_path: str) -> Dict:
+    """
+    Load customer business dictionary from a JSON file.
+
+    Args:
+        dictionary_json_path: Path to customer dictionary JSON file with format:
+        {
+            "terms": [
+                {
+                    "business_term": "...",
+                    "technical_term": "...",
+                    "definition": "...",
+                    "system": "..."
+                }
+            ]
+        }
+
+    Returns:
+        Dictionary with business term definitions
+    """
+    logger = AppConfig.get_default_logger(__name__)
+    logger.info(f"Loading customer dictionary from: {dictionary_json_path}")
+
+    try:
+        with open(dictionary_json_path, 'r') as f:
+            dictionary_data = json.load(f)
+        logger.info("Customer dictionary loaded successfully")
+        return dictionary_data
+    except Exception as e:
+        logger.error(f"Failed to load customer dictionary: {e}")
+        raise
+
+
+def index_harmonizer_metadata(embedding_model: str = None,
+                              acord_json_path: str = None,
+                              schema_json_path: str = None,
+                              dictionary_json_path: str = None) -> int:
+    """
+    Index all harmonizer metadata (ACORD standard, SQL schema, customer dictionary)
+    into ChromaDB.
+
+    This is the main entry point for harmonizer setup. It loads three types of
+    metadata and indexes them into the vector database for semantic mapping.
+
+    Args:
+        embedding_model: Embedding model to use ('openai' or 'ollama'). If None, uses config value.
+        acord_json_path: Path to ACORD standard JSON file
+        schema_json_path: Path to SQL schema metadata JSON file
+        dictionary_json_path: Path to customer dictionary JSON file
+
+    Returns:
+        Total number of documents indexed
+
+    Raises:
+        ValueError: If required paths are not provided or files don't exist
+    """
+    logger = AppConfig.get_default_logger(__name__)
+    logger.info("=== Starting Harmonizer Metadata Indexing ===")
+
+    # Validate input paths
+    if not all([acord_json_path, schema_json_path, dictionary_json_path]):
+        raise ValueError(
+            "All three metadata paths are required: "
+            "acord_json_path, schema_json_path, dictionary_json_path"
+        )
+
+    if not all([os.path.exists(p) for p in [acord_json_path, schema_json_path, dictionary_json_path]]):
+        raise FileNotFoundError("One or more metadata files not found")
+
+    # Use provided embedding model or fallback to config
+    if embedding_model is None:
+        embedding_model = AppConfig.EMBEDDING_MODEL_NAME
+
+    logger.info(f"Using embedding model: {embedding_model}")
+
+    try:
+        # Initialize embeddings
+        api_key = (AppConfig.OPENAI_API_KEY if embedding_model == "openai"
+                   else AppConfig.CLAUDE_API_KEY)
+        embeddings = EmbeddingFactory(model_name=embedding_model, api_key=api_key)
+        embedding_function = embeddings.create_embedding_function()
+
+        # Get database path
+        db_path = AppConfig.get_vector_db_path(embedding_model)
+        logger.info(f"Database path: {db_path}")
+
+        # Initialize MetadataLoader
+        metadata_loader = MetadataLoader(embedding_model, api_key)
+
+        # Load all metadata
+        logger.info("Loading ACORD standard...")
+        acord_data = load_acord_standard_from_json(acord_json_path)
+
+        logger.info("Loading SQL schema metadata...")
+        schema_data = load_sql_schema_from_json(schema_json_path)
+
+        logger.info("Loading customer dictionary...")
+        dictionary_data = load_customer_dictionary_from_json(dictionary_json_path)
+
+        # Index all metadata
+        logger.info("Indexing all metadata documents into ChromaDB...")
+        total_docs = metadata_loader.load_all_metadata(
+            schema_json=schema_data,
+            acord_definitions=acord_data,
+            dictionary_json=dictionary_data,
+            vector_db_path=db_path
+        )
+
+        logger.info(f"=== Harmonizer Metadata Indexing Completed: {total_docs} documents indexed ===")
+        print(f"✅ Successfully indexed {total_docs} metadata documents for harmonization")
+
+        return total_docs
+
+    except Exception as e:
+        logger.error(f"Error during metadata indexing: {e}", exc_info=True)
+        print(f"❌ Error indexing metadata: {e}")
+        raise
+
+
+# Command line interface for metadata indexing
+def create_harmonizer_metadata_parser(parser: argparse.ArgumentParser) -> None:
+    """
+    Add harmonizer metadata indexing arguments to the argument parser.
+
+    Args:
+        parser: The ArgumentParser to add arguments to
+    """
+    parser.add_argument(
+        "--harmonizer-mode",
+        action="store_true",
+        help="Run in harmonizer mode (index SQL schema, ACORD, and dictionary metadata)"
+    )
+    parser.add_argument(
+        "--acord-json",
+        type=str,
+        help="Path to ACORD standard definitions JSON file"
+    )
+    parser.add_argument(
+        "--schema-json",
+        type=str,
+        help="Path to SQL schema metadata JSON file"
+    )
+    parser.add_argument(
+        "--dictionary-json",
+        type=str,
+        help="Path to customer business dictionary JSON file"
+    )
