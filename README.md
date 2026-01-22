@@ -70,16 +70,10 @@ This codebase now supports **three distinct use cases**:
 | 6 | [LLMFactory][Link_16.md] | Factory class to create LLM instances based on model type e.g., 'ollama', 'gpt', 'claude') | [Factory Pattern][Link_17.md] | [Langchain Models][Link_18.md] |
 
 ## Applicable usecases
-### Option I - Knoledge management - supports the scanning of the documents (pdf, doc, excel etc.).
+### Model Harmonization to ACORD
 
 <div style="text-align: center;">
-<img src="https://github.com/inbravo/rag-bot/blob/main/images/kms.png" alt="call-flow">
-</div>
-
-### Option II - Salesforce data (Opportunity, Account, Lead, Contact etc.) intelligence
-
-<div style="text-align: center;">
-<img src="https://github.com/inbravo/rag-bot/blob/main/images/sfdc.png" alt="call-flow">
+<img src="https://github.com/inbravo/rag-bot/blob/copilot/precious-pigeon/images/model-harmon.png" alt="call-flow">
 </div>
 
 ## LLM configuration
